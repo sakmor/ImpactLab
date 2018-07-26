@@ -103,6 +103,7 @@ public class biology : MonoBehaviour
 
 	internal void AttackButtonDown()
 	{
+		StopWalking();
 		if (Time.time - LastAttackTime < IdleCrossFadeTime)
 		{
 			PlayAnimation(AnimationState.Punching_2);
