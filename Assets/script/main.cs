@@ -12,10 +12,13 @@ public class main : MonoBehaviour
 	private GameObject[] targets;
 	private GameObject target;
 	bool isZLook;
+	[SerializeField] private UnityEngine.UI.Slider Slider;
+	internal float HitStopTime;
 
 	// Use this for initialization
 	private void Start()
 	{
+		HitStopTime = Slider.value;
 		targets = GameObject.FindGameObjectsWithTag("blue");
 		cam = GameObject.Find("Main Camera").GetComponent<cameraScript>();
 		camZLook = GameObject.Find("cameraZLook").GetComponent<cameraZLookScript>();
@@ -146,6 +149,11 @@ public class main : MonoBehaviour
 		forward *= vec.y;
 
 		return forward + right;
+	}
+
+	public void SetHitStopTime()
+	{
+		HitStopTime = Slider.value;
 	}
 
 }

@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class biology : MonoBehaviour
 {
+	[SerializeField] internal main main;
+	private float HitStopTime;
 	[SerializeField] internal bool IsPunchNext;
 	[SerializeField] internal bool IsMoveable = true;
 	private Vector3 GoalPos;
@@ -16,7 +18,7 @@ public class biology : MonoBehaviour
 	[SerializeField] private AnimationState AnimationStates;
 	private Animator Animator;
 	public float IdleCrossFadeTime = 1f;
-
+	private IEnumerator coroutine;
 	public enum AnimationState
 	{
 		Idle, Walking, Running, Punching_1, Punching_2, HurtUp
@@ -61,7 +63,7 @@ public class biology : MonoBehaviour
 			if (AnimationStates == AnimationState.Punching_1) { return; }
 			if (AnimationStates == AnimationState.Punching_2) { return; }
 			Animator.CrossFade("Punching_1", 0.1f);
-			Animator.speed = 1;
+			Animator.speed = 1.5f;
 			SetAnimationStates(animationStates);
 			IsMoveable = false;
 		}
@@ -69,14 +71,14 @@ public class biology : MonoBehaviour
 		{
 			if (AnimationStates == AnimationState.Punching_2) { return; }
 			Animator.CrossFade("Punching_2", 0.1f);
-			Animator.speed = 1;
+			Animator.speed = 1.5f;
 			SetAnimationStates(animationStates);
 			IsMoveable = false;
 		}
 		if (animationStates == AnimationState.HurtUp)
 		{
-			if (AnimationStates == AnimationState.HurtUp) { return; }
-			Animator.CrossFade("HurtUp", 0.1f);
+
+			Animator.CrossFade("HurtUp", 0.1f, 0, 0.1f);
 			Animator.speed = 1;
 			SetAnimationStates(animationStates);
 			IsMoveable = false;
@@ -153,10 +155,49 @@ public class biology : MonoBehaviour
 	}
 
 
-	void OnCollisionEnter(Collision other)
+	void OnTriggerEnter(Collider other)
 	{
-		AnimationState AnimationStates = other.transform.root.GetComponent<biology>().AnimationStates;
-		Debug.Log(AnimationStates);
-		if (AnimationStates == AnimationState.Punching_1 || AnimationStates == AnimationState.Punching_2) PlayAnimation(AnimationState.HurtUp);
+		if (other.transform.tag != "Player") return;
+
+		biology biology = other.transform.root.GetComponent<biology>();
+		if (biology == this) return;
+
+		AnimationState AnimationStates = biology.AnimationStates;
+		if (AnimationStates != AnimationState.Punching_1 && AnimationStates != AnimationState.Punching_2) return;
+
+		if (biology.IsMoveable == true) return;
+
+		PlayAnimation(AnimationState.HurtUp);
+		transform.LookAt(other.transform.root);
+		transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
+
+		StopAnimator();
+		biology.StopAnimator();
+		biology.IsMoveable = true;
 	}
+
+	internal void StopAnimator()
+	{
+		HitStopTime = main.HitStopTime;
+		coroutine = wait();
+		StartCoroutine(coroutine);
+	}
+
+	private float waitCounter = 0;
+	IEnumerator wait()
+	{
+		waitCounter = 0;
+		Animator.enabled = false;
+		while (waitCounter < HitStopTime)
+		{
+			Debug.Log(waitCounter);
+			waitCounter += Time.unscaledDeltaTime;
+
+			//Yield until the next frame
+			yield return null;
+		}
+		Animator.enabled = true;
+	}
+
+
 }
