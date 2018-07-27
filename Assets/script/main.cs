@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class main : MonoBehaviour
 {
+	private float KeyboardMoveSpeed = 3.5f;
 	private visualJoyStick visualJoyStick;
 	private cameraScript cam;
 	private cameraZLookScript camZLook;
@@ -81,22 +82,32 @@ public class main : MonoBehaviour
 		if (Input.GetKey("w"))
 		{
 			newDirect = transformJoyStickSpace(Vector2.up, cam.transform);
-			player.MoveTo(newDirect * 0.5f);//fixme:0.25要放到外部控制
+			player.MoveTo(newDirect * 0.5f * KeyboardMoveSpeed);//fixme:0.25要放到外部控制
 		}
 		if (Input.GetKey("a"))
 		{
 			newDirect = transformJoyStickSpace(Vector2.left, cam.transform);
-			player.MoveTo(newDirect * 0.5f);//fixme:0.25要放到外部控制
+			player.MoveTo(newDirect * 0.5f * KeyboardMoveSpeed);//fixme:0.25要放到外部控制
 		}
 		if (Input.GetKey("s"))
 		{
 			newDirect = transformJoyStickSpace(Vector2.down, cam.transform);
-			player.MoveTo(newDirect * 0.5f);//fixme:0.25要放到外部控制
+			player.MoveTo(newDirect * 0.5f * KeyboardMoveSpeed);//fixme:0.25要放到外部控制
 		}
 		if (Input.GetKey("d"))
 		{
 			newDirect = transformJoyStickSpace(Vector2.right, cam.transform);
-			player.MoveTo(newDirect * 0.5f);//fixme:0.25要放到外部控制s
+			player.MoveTo(newDirect * 0.5f * KeyboardMoveSpeed);//fixme:0.25要放到外部控制s
+		}
+		if (Input.GetAxis("Mouse ScrollWheel") > 0)
+		{
+			KeyboardMoveSpeed += 0.1f;
+			KeyboardMoveSpeed = Mathf.Clamp(KeyboardMoveSpeed, 1, 6);
+		}
+		if (Input.GetAxis("Mouse ScrollWheel") < 0)
+		{
+			KeyboardMoveSpeed -= 0.1f;
+			KeyboardMoveSpeed = Mathf.Clamp(KeyboardMoveSpeed, 1, 6);
 		}
 		if (Input.GetMouseButtonDown(1))
 		{

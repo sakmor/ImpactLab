@@ -19,7 +19,7 @@ public class biology : MonoBehaviour
 
 	public enum AnimationState
 	{
-		Idle, Walking, Running, Punching_1, Punching_2
+		Idle, Walking, Running, Punching_1, Punching_2, HurtUp
 	}
 	void Start()
 	{
@@ -69,6 +69,14 @@ public class biology : MonoBehaviour
 		{
 			if (AnimationStates == AnimationState.Punching_2) { return; }
 			Animator.CrossFade("Punching_2", 0.1f);
+			Animator.speed = 1;
+			SetAnimationStates(animationStates);
+			IsMoveable = false;
+		}
+		if (animationStates == AnimationState.HurtUp)
+		{
+			if (AnimationStates == AnimationState.HurtUp) { return; }
+			Animator.CrossFade("HurtUp", 0.1f);
 			Animator.speed = 1;
 			SetAnimationStates(animationStates);
 			IsMoveable = false;
@@ -142,5 +150,13 @@ public class biology : MonoBehaviour
 		float step = espeed * Time.deltaTime;
 		Vector3 newDir = Vector3.RotateTowards(this.transform.forward, targetDir, step, 0.0f);
 		this.transform.rotation = Quaternion.LookRotation(newDir);
+	}
+
+
+	void OnCollisionEnter(Collision other)
+	{
+		AnimationState AnimationStates = other.transform.root.GetComponent<biology>().AnimationStates;
+		Debug.Log(AnimationStates);
+		if (AnimationStates == AnimationState.Punching_1 || AnimationStates == AnimationState.Punching_2) PlayAnimation(AnimationState.HurtUp);
 	}
 }
