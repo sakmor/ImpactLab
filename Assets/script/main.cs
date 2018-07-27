@@ -78,15 +78,34 @@ public class main : MonoBehaviour
 			if (isZLook) newDirect = transformJoyStickSpace(visualJoyStick.joyStickVec, camZLook.transform);
 			player.MoveTo(newDirect / 2.0f);//fixme:0.25要放到外部控制
 		}
-		else
+		if (Input.GetKey("w"))
 		{
-			player.StopWalking();
+			newDirect = transformJoyStickSpace(Vector2.up, cam.transform);
+			player.MoveTo(newDirect * 0.5f);//fixme:0.25要放到外部控制
 		}
-		if (Input.GetKeyDown("space"))
+		if (Input.GetKey("a"))
+		{
+			newDirect = transformJoyStickSpace(Vector2.left, cam.transform);
+			player.MoveTo(newDirect * 0.5f);//fixme:0.25要放到外部控制
+		}
+		if (Input.GetKey("s"))
+		{
+			newDirect = transformJoyStickSpace(Vector2.down, cam.transform);
+			player.MoveTo(newDirect * 0.5f);//fixme:0.25要放到外部控制
+		}
+		if (Input.GetKey("d"))
+		{
+			newDirect = transformJoyStickSpace(Vector2.right, cam.transform);
+			player.MoveTo(newDirect * 0.5f);//fixme:0.25要放到外部控制s
+		}
+		if (Input.GetMouseButtonDown(1))
 		{
 			player.AttackButtonDown();
 		}
-
+		if (Input.anyKey == false)
+		{
+			player.StopWalking();
+		}
 	}
 	private void useZLookCam()
 	{

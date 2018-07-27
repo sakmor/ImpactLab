@@ -5,14 +5,16 @@ using UnityEngine;
 
 public class biology : MonoBehaviour
 {
+	[SerializeField] internal bool IsPunchNext;
+	[SerializeField] internal bool IsMoveable = true;
 	private Vector3 GoalPos;
 	[SerializeField] private float Speed;
 	[SerializeField] private float MoveStep;
 	public bool isRandom;
 	[SerializeField] internal float LastAttackTime;
-	private Animator Animator;
-	[SerializeField] private AnimationState AnimationStates;
 
+	[SerializeField] private AnimationState AnimationStates;
+	private Animator Animator;
 	public float IdleCrossFadeTime = 1f;
 
 	public enum AnimationState
@@ -40,11 +42,12 @@ public class biology : MonoBehaviour
 			Animator.CrossFade("Idle", 0.1f);
 			Animator.speed = 1;
 			SetAnimationStates(animationStates);
+			IsMoveable = true;
 		}
 		if (animationStates == AnimationState.Walking)
 		{
 			if (AnimationStates == AnimationState.Walking) { Animator.speed = Speed * MoveStep; return; }
-			Animator.CrossFade("Walking", 0.35f);
+			Animator.CrossFade("Walking", 1.0f);
 			SetAnimationStates(animationStates);
 		}
 		if (animationStates == AnimationState.Running)
@@ -60,6 +63,7 @@ public class biology : MonoBehaviour
 			Animator.CrossFade("Punching_1", 0.1f);
 			Animator.speed = 1;
 			SetAnimationStates(animationStates);
+			IsMoveable = false;
 		}
 		if (animationStates == AnimationState.Punching_2)
 		{
@@ -67,6 +71,7 @@ public class biology : MonoBehaviour
 			Animator.CrossFade("Punching_2", 0.1f);
 			Animator.speed = 1;
 			SetAnimationStates(animationStates);
+			IsMoveable = false;
 		}
 	}
 
@@ -84,17 +89,25 @@ public class biology : MonoBehaviour
 		}
 	}
 
-	internal void SetLastAttackTime()
+	internal void SetIsMoveableTrue()
 	{
+		IsMoveable = true;
+	}
+
+	internal void SetIsPunchNext()
+	{
+		IsPunchNext = true;
 		LastAttackTime = Time.time;
 	}
 	internal void MoveTo(Vector3 direct)
 	{
+		if (IsMoveable == false) return;
+
 		GoalPos = transform.position + direct;
 		Speed = direct.magnitude;
 
 		transform.position = Vector3.MoveTowards(transform.position, GoalPos, Speed * Time.deltaTime);
-		faceTarget(GoalPos, Speed * 5);
+		faceTarget(GoalPos, Speed * 10.0f);
 		float threshold = 0.9f;
 		if (Speed <= threshold) PlayAnimation(AnimationState.Walking);
 		if (Speed > threshold) PlayAnimation(AnimationState.Running);
@@ -108,7 +121,7 @@ public class biology : MonoBehaviour
 		{
 			PlayAnimation(AnimationState.Punching_2);
 		}
-		else
+		if (IsPunchNext == false && AnimationStates == AnimationState.Idle)
 		{
 			PlayAnimation(AnimationState.Punching_1);
 		}
