@@ -14,7 +14,6 @@ public class biology : MonoBehaviour
     [SerializeField] private float MoveStep;
     public bool isRandom;
     [SerializeField] internal float LastAttackTime;
-
     [SerializeField] private AnimationState AnimationStates;
     private Animator Animator;
     public float IdleCrossFadeTime = 1f;
@@ -202,16 +201,26 @@ public class biology : MonoBehaviour
         Animator.enabled = true;
     }
 
+
     IEnumerator Shake(Collider other)
     {
         float waitCounter = 0;
+        Vector3 directon = other.transform.forward;
+        directon = new Vector3(directon.x, 0, directon.z);
         Vector3 _position = transform.position;
+        float lastShakeTime = 0;
+        float shakeTimes = HitStopTime / main.ShakeTimes;
+        float _ShakePower = main.ShakePower;
         while (waitCounter < HitStopTime)
         {
-            float r = UnityEngine.Random.Range(-0.05f, -0.01f);
-            transform.position = _position + other.transform.forward * r;
             waitCounter += Time.fixedDeltaTime;
-            //Yield until the next frame
+
+            if (waitCounter - lastShakeTime >= shakeTimes)
+            {
+                lastShakeTime = waitCounter;
+                transform.position = _position - directon * _ShakePower;
+                _ShakePower *= UnityEngine.Random.Range(0.5f, 0.9f);
+            }
             yield return null;
         }
         transform.position = _position;

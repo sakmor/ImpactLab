@@ -9,6 +9,7 @@ public class main : MonoBehaviour
     private cameraScript cam;
     private cameraZLookScript camZLook;
     [SerializeField] private biology player;
+    [SerializeField] internal float ShakeTimes, ShakePower;
     private GameObject[] targets;
     private GameObject target;
     bool isZLook;
