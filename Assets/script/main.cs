@@ -27,7 +27,7 @@ public class main : MonoBehaviour
         cam = GameObject.Find("Main Camera").GetComponent<cameraScript>();
         camZLook = GameObject.Find("cameraZLook").GetComponent<cameraZLookScript>();
         visualJoyStick = GameObject.Find("visualJoyStick").GetComponent<visualJoyStick>();
-        cam.setTarget(player.transform);
+        cam.setTarget(player.CameraPoint);
         camZLook.setFollowTarget(player.transform);
     }
 

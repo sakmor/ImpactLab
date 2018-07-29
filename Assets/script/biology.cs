@@ -6,6 +6,7 @@ using UnityEngine;
 public class biology : MonoBehaviour
 {
     [SerializeField] internal main main;
+    [SerializeField] internal GameObject Basic_rig;
     private float HitStopTime;
     [SerializeField] internal bool IsPunchNext;
     [SerializeField] internal bool IsMoveable = true;
@@ -15,21 +16,29 @@ public class biology : MonoBehaviour
     public bool isRandom;
     [SerializeField] internal float LastAttackTime;
     [SerializeField] private AnimationState AnimationStates;
+    [SerializeField] internal Transform CameraPoint;
     private Animator Animator;
     public float IdleCrossFadeTime = 1f;
     public enum AnimationState
     {
-        Idle, Walking, Running, Punching_1, Punching_2, HurtUp
+        Idle, Walking, Running, Punching_1, Punching_2, Punching_3, HurtLeft, HurtRight
     }
-    void Start()
+    private void Start()
     {
         GoalPos = transform.position;
         Animator = GetComponent<Animator>();
         InvokeRepeating("randomMove", 1f, UnityEngine.Random.Range(3f, 5f));
     }
-    void Update()
+    private void Update()
     {
 
+    }
+
+    internal void SetPostionByBasicRig()
+    {
+        transform.position = Basic_rig.transform.position;
+        Vector3 n = transform.position;
+        transform.position = new Vector3(n.x, 0, n.z);
     }
 
     internal void PlayAnimation(AnimationState animationStates)
@@ -73,10 +82,23 @@ public class biology : MonoBehaviour
             SetAnimationStates(animationStates);
             IsMoveable = false;
         }
-        if (animationStates == AnimationState.HurtUp)
+        if (animationStates == AnimationState.HurtLeft)
         {
-
-            Animator.CrossFade("HurtUp", 0.1f, 0, 0.1f);
+            Animator.CrossFade("HurtLeft", 0.1f, 0, 0.1f);
+            Animator.speed = 1;
+            SetAnimationStates(animationStates);
+            IsMoveable = false;
+        }
+        if (animationStates == AnimationState.HurtRight)
+        {
+            Animator.CrossFade("HurtRight", 0.1f, 0, 0.1f);
+            Animator.speed = 1;
+            SetAnimationStates(animationStates);
+            IsMoveable = false;
+        }
+        if (animationStates == AnimationState.Punching_3)
+        {
+            Animator.CrossFade("Punching_3", 0.1f, 0, 0.1f);
             Animator.speed = 1;
             SetAnimationStates(animationStates);
             IsMoveable = false;
@@ -165,7 +187,8 @@ public class biology : MonoBehaviour
 
         if (biology.IsMoveable == true) return;
 
-        PlayAnimation(AnimationState.HurtUp);
+        if (biology.AnimationStates == AnimationState.Punching_1) PlayAnimation(AnimationState.HurtRight);
+        if (biology.AnimationStates == AnimationState.Punching_2) PlayAnimation(AnimationState.HurtLeft);
         transform.LookAt(other.transform.root);
         transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
 
@@ -174,8 +197,7 @@ public class biology : MonoBehaviour
         biology.StopAnimator();
         GameObject Effect = Instantiate(main.Effects[2]);
         Effect.transform.position = other.ClosestPoint(transform.position);
-        Effect.AddComponent<ParticleSystemAutoDestroy>();
-        biology.IsMoveable = true;
+        biology.IsMoveable = true;// 這項目控制這一次動畫傷害是否只算一次
     }
 
     internal void StopAnimator()
@@ -205,7 +227,7 @@ public class biology : MonoBehaviour
     IEnumerator Shake(Collider other)
     {
         float waitCounter = 0;
-        Vector3 directon = other.transform.forward;
+        Vector3 directon = other.transform.up;
         directon = new Vector3(directon.x, 0, directon.z);
         Vector3 _position = transform.position;
         float lastShakeTime = 0;
@@ -218,7 +240,7 @@ public class biology : MonoBehaviour
             if (waitCounter - lastShakeTime >= shakeTimes)
             {
                 lastShakeTime = waitCounter;
-                transform.position = _position - directon * _ShakePower;
+                transform.position = _position + directon * _ShakePower;
                 _ShakePower *= UnityEngine.Random.Range(0.5f, 0.9f);
             }
             yield return null;
