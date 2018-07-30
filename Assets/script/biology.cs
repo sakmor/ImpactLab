@@ -106,11 +106,17 @@ public class biology : MonoBehaviour
 		}
 		if (animationStates == AnimationState.Punching_3)
 		{
-			Animator.CrossFade("Punching_3", 0.1f, 0, 0.1f);
-			Animator.speed = 1;
+			Animator.CrossFade("Punching_3", 0.1f);
+			Animator.speed = 1.5f;
 			SetAnimationStates(animationStates);
 			SetIsMoveableFalse();
 		}
+	}
+
+	internal void SpaceButtonDown()
+	{
+		StopWalking();
+		PlayAnimation(AnimationState.Punching_3);
 	}
 
 	internal void SetAnimationStates(AnimationState animationStates)
@@ -199,7 +205,7 @@ public class biology : MonoBehaviour
 	}
 
 
-	void OnTriggerEnter(Collider other)
+	void OnTriggerStay(Collider other)
 	{
 		if (other.transform.tag != "Player") return;
 
@@ -214,7 +220,7 @@ public class biology : MonoBehaviour
 		if (biology.AnimationStates == AnimationState.Punching_1) PlayAnimation(AnimationState.HurtRight);
 		if (biology.AnimationStates == AnimationState.Punching_2) PlayAnimation(AnimationState.HurtLeft);
 		transform.LookAt(other.transform.root);
-		biology.transform.LookAt(transform.root);
+		// biology.transform.LookAt(transform.root);
 		transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
 		transform.position -= transform.forward * biology.HitBack;
 
@@ -257,8 +263,8 @@ public class biology : MonoBehaviour
 	{
 		float waitCounter = 0;
 		Color _Color = Material.GetColor("_EmissionColor");
-		ModelRender.materials[0].SetColor("_EmissionColor", Color.white);
-		ModelRender.materials[1].SetColor("_EmissionColor", Color.white);
+		ModelRender.materials[0].SetColor("_EmissionColor", _Color + 0.65f * Color.white);
+		ModelRender.materials[1].SetColor("_EmissionColor", _Color + 0.65f * Color.white);
 		while (waitCounter < HitStopTime)
 		{
 			waitCounter += Time.fixedDeltaTime;
