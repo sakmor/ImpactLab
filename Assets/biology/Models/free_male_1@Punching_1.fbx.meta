@@ -136,6 +136,13 @@ ModelImporter:
       bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
       curves: []
       events:
+      - time: 0.16961884
+        functionName: SetIsAttackableTrue
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 0.36575383
         functionName: SetIsPunchNext
         data: 
@@ -145,6 +152,13 @@ ModelImporter:
         messageOptions: 0
       - time: 0.3848298
         functionName: SetIsMoveableTrue
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.33764634
+        functionName: SetIsAttackableFalse
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
