@@ -12,6 +12,8 @@ public class biology : MonoBehaviour
     [SerializeField] internal bool IsMoveable = true;
     private Vector3 GoalPos;
     [SerializeField] private float Speed;
+    [SerializeField] private Renderer ModelRender;
+    private Material Material;
     [SerializeField] private float MoveStep;
     public bool isRandom;
     [SerializeField] internal float LastAttackTime;
@@ -28,6 +30,8 @@ public class biology : MonoBehaviour
         GoalPos = transform.position;
         Animator = GetComponent<Animator>();
         InvokeRepeating("randomMove", 1f, UnityEngine.Random.Range(3f, 5f));
+        Material = Instantiate(ModelRender.materials[0]);
+        ModelRender.materials[0] = ModelRender.materials[1] = Material;
     }
     private void Update()
     {
@@ -193,6 +197,7 @@ public class biology : MonoBehaviour
         transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
 
         StopAnimator();
+        StartHitFLash();
         StartShake(other);
         biology.StopAnimator();
         GameObject Effect = Instantiate(main.Effects[2]);
@@ -209,7 +214,10 @@ public class biology : MonoBehaviour
     {
         StartCoroutine("Shake", other);
     }
-
+    internal void StartHitFLash()
+    {
+        StartCoroutine("HitFLash");
+    }
     IEnumerator Wait()
     {
         float waitCounter = 0;
@@ -221,6 +229,21 @@ public class biology : MonoBehaviour
             yield return null;
         }
         Animator.enabled = true;
+    }
+    IEnumerator HitFLash()
+    {
+        float waitCounter = 0;
+        Color _Color = Material.GetColor("_EmissionColor");
+        ModelRender.materials[0].SetColor("_EmissionColor", Color.white);
+        ModelRender.materials[1].SetColor("_EmissionColor", Color.white);
+        while (waitCounter < HitStopTime)
+        {
+            waitCounter += Time.fixedDeltaTime;
+            //Yield until the next frame
+            yield return null;
+        }
+        ModelRender.materials[0].SetColor("_EmissionColor", _Color);
+        ModelRender.materials[1].SetColor("_EmissionColor", _Color);
     }
 
 
