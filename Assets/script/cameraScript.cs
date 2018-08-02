@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
+using System;
+using System.Collections;
+using System.Collections.Generic;
 
 //我是從下面這個檔案改得
 //http://wiki.unity3d.com/index.php?title=MouseOrbitImproved
@@ -7,6 +10,7 @@ using UnityEngine.EventSystems;
 [AddComponentMenu("Camera-Control/Mouse Orbit with zoom")]
 public class cameraScript : MonoBehaviour
 {
+    [SerializeField] main Main;
     bool isZLook;
     float distance = 2f;
     float xSpeed = 5.0f;
@@ -95,6 +99,36 @@ public class cameraScript : MonoBehaviour
         y = n.eulerAngles.x;
         x = n.eulerAngles.y;
         mouseOrbit();
+    }
+
+    public void StartShake(Collider other)
+    {
+        StartCoroutine("Shake", other);
+    }
+
+    IEnumerator Shake(Collider other)
+    {
+
+        float waitCounter = 0;
+        Vector3 directon = other.transform.up;
+        directon = new Vector3(directon.x, 0, directon.z);
+        Vector3 _position = target.position;
+        float lastShakeTime = 0;
+        float shakeTimes = Main.HitStopTime / Main.ShakeTimes;
+        float _ShakePower = Main.ShakePower;
+        while (waitCounter < Main.HitStopTime)
+        {
+            waitCounter += Time.deltaTime;
+
+            if (waitCounter - lastShakeTime >= shakeTimes)
+            {
+                lastShakeTime = waitCounter;
+                target.position = _position - directon * _ShakePower;
+                _ShakePower *= UnityEngine.Random.Range(0.5f, 0.9f);
+            }
+            yield return null;
+        }
+        target.position = _position;
     }
 
 }
