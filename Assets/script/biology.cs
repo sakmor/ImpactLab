@@ -7,8 +7,6 @@ public class biology : MonoBehaviour
 {
     [SerializeField] internal main Main;
     private float HitStopTime;
-    [SerializeField] internal bool IsPunchNext;
-    [SerializeField] internal bool IsMoveable = true;
     private Vector3 GoalPos;
     [SerializeField]
     private float Speed;
@@ -17,11 +15,10 @@ public class biology : MonoBehaviour
     [SerializeField] private float MoveStep;
     public biology Target;
     public bool isRandom;
-    [SerializeField] internal float LastAttackTime;
     [SerializeField] private AnimationState AnimationStates;
     [SerializeField] internal Transform CameraPoint;
-    private Animator Animator;
-    public float IdleCrossFadeTime = 1f;
+    [SerializeField] internal Animator Animator;
+
 
 
     public bool IsAttackable;
@@ -33,7 +30,6 @@ public class biology : MonoBehaviour
     private void Start()
     {
         GoalPos = transform.position;
-        Animator = GetComponent<Animator>();
         InvokeRepeating("randomMove", 1f, UnityEngine.Random.Range(3f, 5f));
         Material = Instantiate(ModelRender.materials[0]);
         ModelRender.materials[0] = ModelRender.materials[1] = Material;
@@ -43,67 +39,6 @@ public class biology : MonoBehaviour
 
     }
 
-    internal void PlayAnimation(AnimationState animationStates)
-    {
-        if (animationStates == AnimationState.Idle)
-        {
-            if (AnimationStates == AnimationState.Idle) return;
-            Animator.CrossFade("Idle", 0.1f);
-            Animator.speed = 1;
-            SetAnimationStates(animationStates);
-            SetIsMoveableTrue();
-        }
-        if (animationStates == AnimationState.Walking)
-        {
-            if (AnimationStates == AnimationState.Walking) { Animator.speed = Speed * MoveStep; return; }
-            Animator.CrossFade("Walking", 1.0f);
-            SetAnimationStates(animationStates);
-        }
-        if (animationStates == AnimationState.Running)
-        {
-            if (AnimationStates == AnimationState.Running) { Animator.speed = Speed * 0.25f * MoveStep; return; }
-            Animator.CrossFade("Running", 0.80f);
-            SetAnimationStates(animationStates);
-        }
-        if (animationStates == AnimationState.Punching_1)
-        {
-            if (AnimationStates == AnimationState.Punching_1) { return; }
-            if (AnimationStates == AnimationState.Punching_2) { return; }
-            Animator.CrossFade("Punching_1", 0.1f);
-            Animator.speed = 1.5f;
-            SetAnimationStates(animationStates);
-            SetIsMoveableFalse();
-        }
-        if (animationStates == AnimationState.Punching_2)
-        {
-            if (AnimationStates == AnimationState.Punching_2) { return; }
-            Animator.CrossFade("Punching_2", 0.1f);
-            Animator.speed = 1.5f;
-            SetAnimationStates(animationStates);
-            SetIsMoveableFalse();
-        }
-        if (animationStates == AnimationState.HurtLeft)
-        {
-            Animator.CrossFade("HurtLeft", 0.1f, 0, 0.1f);
-            Animator.speed = 1;
-            SetAnimationStates(animationStates);
-            SetIsMoveableFalse();
-        }
-        if (animationStates == AnimationState.HurtRight)
-        {
-            Animator.CrossFade("HurtRight", 0.1f, 0, 0.1f);
-            Animator.speed = 1;
-            SetAnimationStates(animationStates);
-            SetIsMoveableFalse();
-        }
-        if (animationStates == AnimationState.Punching_3)
-        {
-            Animator.CrossFade("Punching_3", 0.1f);
-            Animator.speed = 1.5f;
-            SetAnimationStates(animationStates);
-            SetIsMoveableFalse();
-        }
-    }
     internal void searchClosetTarget()
     {
         float dist = Mathf.Infinity;
@@ -123,8 +58,8 @@ public class biology : MonoBehaviour
 
     internal void SpaceButtonDown()
     {
-        StopWalking();
-        PlayAnimation(AnimationState.Punching_3);
+        // StopWalking();
+        // PlayAnimation(AnimationState.Punching_3);
     }
 
     internal void SetAnimationStates(AnimationState animationStates)
@@ -141,58 +76,41 @@ public class biology : MonoBehaviour
         }
     }
 
-    internal void SetIsMoveableTrue()
-    {
-        IsMoveable = true;
-    }
-    internal void SetIsMoveableFalse()
-    {
-        IsMoveable = false;
-    }
     // Call by AnimationEvent
-    internal void SetIsAttackableTrue()
-    {
-        IsAttackable = true;
-    }
-    internal void SetIsAttackableFalse()
-    {
-        IsAttackable = false;
-    }
-    internal void SetIsPunchNextTrue()
-    {
-        IsPunchNext = true;
-        LastAttackTime = Time.time;
-    }
+    internal void SetIsMoveableTrue() { Animator.SetBool("IsMoveable", true); } //todo:IsMoveable、IsAttackabl、是不是該放到 Animator 內呢...
+    internal void SetIsMoveableFalse() { Animator.SetBool("IsMoveable", false); }
+    internal void SetIsAttackableTrue() { IsAttackable = true; }
+    internal void SetIsAttackableFalse() { IsAttackable = false; }
+    internal void SetIsPunchNextTrue() { Animator.SetBool("IsPunchNext", true); }
+    internal void SetIsPunchNextFalse() { Animator.SetBool("IsPunchNext", false); }
+    internal void SetIsPunchingTrue() { Animator.SetBool("IsPunching", true); }
+    internal void SetIsPunchingFalse() { Animator.SetBool("IsPunching", false); }
+    internal void SetIsHurtLeftTrue() { Animator.SetBool("IsHurtLeft", true); }
+    internal void SetIsHurtLeftFalse() { Animator.SetBool("IsHurtLeft", false); }
+    internal void SetIsHurtRightTrue() { Animator.SetBool("IsHurtRight", true); }
+    internal void SetIsHurtRightFalse() { Animator.SetBool("IsHurtRight", false); }
+    private void SetMoveSpeed(float t) { Speed = t; Animator.SetFloat("MoveSpeed", Speed); }
 
-    internal void SetIsPunchNextFalse()
-    {
-        IsPunchNext = false;
-    }
+
     internal void MoveTo(Vector3 direct)
     {
-        if (IsMoveable == false) return;
+        if (Animator.GetBool("IsMoveable") == false) { SetMoveSpeed(0); return; }
 
         GoalPos = transform.position + direct;
-        SetSpeed(direct.magnitude);
+        SetMoveSpeed(direct.magnitude);
         transform.position = Vector3.MoveTowards(transform.position, GoalPos, Speed * Time.deltaTime);
         faceTarget(GoalPos, Speed * 10.0f);
-        // float threshold = 0.9f;
-        // if (Speed <= threshold) PlayAnimation(AnimationState.Walking);
-        // if (Speed > threshold) PlayAnimation(AnimationState.Running);
 
     }
 
     internal void AttackButtonDown()
     {
-        StopWalking();
-        if (Time.time - LastAttackTime < IdleCrossFadeTime)
-        {
-            PlayAnimation(AnimationState.Punching_2);
-        }
-        if (IsPunchNext == false && AnimationStates == AnimationState.Idle)
-        {
-            PlayAnimation(AnimationState.Punching_1);
-        }
+        SetIsMoveableFalse();
+        SetIsPunchingTrue();
+        // if (Animator.GetInteger("PuchingState") == 2 && IsAttackable == false) { SetPuchingState(0); }
+        // if (Animator.GetInteger("PuchingState") == 1 && IsAttackable == false) { SetPuchingState(2); }
+        // if (Animator.GetInteger("PuchingState") == 0 && IsAttackable == false) { SetPuchingState(1); }
+
     }
 
     internal void OffsetBackward(float n)
@@ -202,9 +120,10 @@ public class biology : MonoBehaviour
 
     internal void StopWalking()
     {
-        if (AnimationStates == AnimationState.Punching_1) return;
-        if (AnimationStates == AnimationState.Punching_2) return;
-        SetSpeed(0);
+        // if (AnimationStates == AnimationState.Punching_1) return;
+        // if (AnimationStates == AnimationState.Punching_2) return;
+        // SetIsMoveableFalse();
+        SetMoveSpeed(0);
     }
 
 
@@ -224,12 +143,11 @@ public class biology : MonoBehaviour
         if (hitMeBiology == this) return;
 
         AnimationState AnimationStates = hitMeBiology.AnimationStates;
-        if (AnimationStates != AnimationState.Punching_1 && AnimationStates != AnimationState.Punching_2) return;
 
         if (hitMeBiology.IsAttackable == false) return;
 
-        if (hitMeBiology.AnimationStates == AnimationState.Punching_1) PlayAnimation(AnimationState.HurtRight);
-        if (hitMeBiology.AnimationStates == AnimationState.Punching_2) PlayAnimation(AnimationState.HurtLeft);
+        if (other.gameObject.name == "SphereRight") SetIsHurtRightTrue();
+        if (other.gameObject.name == "SphereLeft") SetIsHurtLeftTrue();
         transform.LookAt(other.transform.root);
         transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
 
@@ -314,10 +232,6 @@ public class biology : MonoBehaviour
         }
         transform.position = _position;
     }
-    private void SetSpeed(float t)
-    {
-        Speed = t;
-        Animator.SetFloat("MoveSpeed", Speed);
-    }
+
 
 }
