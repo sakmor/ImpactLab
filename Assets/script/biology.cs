@@ -22,9 +22,9 @@ public class biology : MonoBehaviour
     [SerializeField] internal Transform CameraPoint;
     private Animator Animator;
     public float IdleCrossFadeTime = 1f;
-    [SerializeField] private float HitBack;
 
-    public bool IsAttackable { get; private set; }
+
+    public bool IsAttackable;
 
     public enum AnimationState
     {
@@ -45,11 +45,9 @@ public class biology : MonoBehaviour
 
     internal void PlayAnimation(AnimationState animationStates)
     {
-        Animator.ResetTrigger("Idle");
         if (animationStates == AnimationState.Idle)
         {
             if (AnimationStates == AnimationState.Idle) return;
-            Animator.SetTrigger("Idle");
             Animator.CrossFade("Idle", 0.1f);
             Animator.speed = 1;
             SetAnimationStates(animationStates);
@@ -151,19 +149,24 @@ public class biology : MonoBehaviour
     {
         IsMoveable = false;
     }
-    internal void SetIsAttackableTrue(float n)
+    // Call by AnimationEvent
+    internal void SetIsAttackableTrue()
     {
-        HitBack = n;
         IsAttackable = true;
     }
     internal void SetIsAttackableFalse()
     {
         IsAttackable = false;
     }
-    internal void SetIsPunchNext()
+    internal void SetIsPunchNextTrue()
     {
         IsPunchNext = true;
         LastAttackTime = Time.time;
+    }
+
+    internal void SetIsPunchNextFalse()
+    {
+        IsPunchNext = false;
     }
     internal void MoveTo(Vector3 direct)
     {
@@ -173,7 +176,6 @@ public class biology : MonoBehaviour
         SetSpeed(direct.magnitude);
         transform.position = Vector3.MoveTowards(transform.position, GoalPos, Speed * Time.deltaTime);
         faceTarget(GoalPos, Speed * 10.0f);
-        Animator.SetBool("IsMove", true);
         // float threshold = 0.9f;
         // if (Speed <= threshold) PlayAnimation(AnimationState.Walking);
         // if (Speed > threshold) PlayAnimation(AnimationState.Running);
@@ -217,29 +219,27 @@ public class biology : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        if (other.transform.tag != "Player") return;
+        if (other.transform.root.GetComponent<biology>() == null) return;
+        biology hitMeBiology = other.transform.root.GetComponent<biology>();
+        if (hitMeBiology == this) return;
 
-        biology biology = other.transform.root.GetComponent<biology>();
-        if (biology == this) return;
-
-        AnimationState AnimationStates = biology.AnimationStates;
+        AnimationState AnimationStates = hitMeBiology.AnimationStates;
         if (AnimationStates != AnimationState.Punching_1 && AnimationStates != AnimationState.Punching_2) return;
 
-        if (biology.IsAttackable == false) return;
+        if (hitMeBiology.IsAttackable == false) return;
 
-        if (biology.AnimationStates == AnimationState.Punching_1) PlayAnimation(AnimationState.HurtRight);
-        if (biology.AnimationStates == AnimationState.Punching_2) PlayAnimation(AnimationState.HurtLeft);
+        if (hitMeBiology.AnimationStates == AnimationState.Punching_1) PlayAnimation(AnimationState.HurtRight);
+        if (hitMeBiology.AnimationStates == AnimationState.Punching_2) PlayAnimation(AnimationState.HurtLeft);
         transform.LookAt(other.transform.root);
-        // biology.transform.LookAt(transform.root);
         transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
-        transform.position -= transform.forward * biology.HitBack;
+
 
         StopAnimator();
         if (Main.IsHittedFlash) StartHitFLash();
         StartShake(other);
-        biology.StopAnimator();
+        hitMeBiology.StopAnimator();
 
-        biology.IsAttackable = false;// 這項目控制這一次動畫傷害是否只算一次
+        hitMeBiology.SetIsAttackableFalse();// 這項目控制這一次動畫傷害是否只算一次
 
         if (Main.IsCameraShake) Main.cam.StartShake(other);
 
@@ -318,7 +318,6 @@ public class biology : MonoBehaviour
     {
         Speed = t;
         Animator.SetFloat("MoveSpeed", Speed);
-
     }
 
 }

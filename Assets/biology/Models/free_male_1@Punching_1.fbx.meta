@@ -99,7 +99,7 @@ ModelImporter:
     rigImportErrors: 
     rigImportWarnings: 
     animationImportErrors: 
-    animationImportWarnings: Event SetIsMoveableTrue has a time (0.800000) outside
+    animationImportWarnings: Event SetIsPunchNextFalse has a time (0.658647) outside
       the clip's valid range (0.000000..0.500000). It will never be fired
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
@@ -152,7 +152,7 @@ ModelImporter:
         intParameter: 0
         messageOptions: 0
       - time: 0.36575383
-        functionName: SetIsPunchNext
+        functionName: SetIsPunchNextTrue
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
@@ -160,6 +160,13 @@ ModelImporter:
         messageOptions: 0
       - time: 0.446
         functionName: SetIsMoveableTrue
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
+      - time: 0.51068693
+        functionName: SetIsPunchNextFalse
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
