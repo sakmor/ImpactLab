@@ -1,7 +1,7 @@
 fileFormatVersion: 2
 guid: e58e4f3a9bb0a754cb0e3186dee9ecf6
 ModelImporter:
-  serializedVersion: 22
+  serializedVersion: 23
   fileIDToRecycleName:
     100000: basic_rig Footsteps
     100002: basic_rig Head
@@ -99,7 +99,8 @@ ModelImporter:
     rigImportErrors: 
     rigImportWarnings: 
     animationImportErrors: 
-    animationImportWarnings: 
+    animationImportWarnings: Event SetIsMoveableTrue has a time (0.800000) outside
+      the clip's valid range (0.000000..0.500000). It will never be fired
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
@@ -143,6 +144,13 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
+      - time: 0.33764634
+        functionName: SetIsAttackableFalse
+        data: 
+        objectReferenceParameter: {instanceID: 0}
+        floatParameter: 0
+        intParameter: 0
+        messageOptions: 0
       - time: 0.36575383
         functionName: SetIsPunchNext
         data: 
@@ -150,15 +158,8 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.3848298
+      - time: 0.446
         functionName: SetIsMoveableTrue
-        data: 
-        objectReferenceParameter: {instanceID: 0}
-        floatParameter: 0
-        intParameter: 0
-        messageOptions: 0
-      - time: 0.33764634
-        functionName: SetIsAttackableFalse
         data: 
         objectReferenceParameter: {instanceID: 0}
         floatParameter: 0
@@ -191,6 +192,8 @@ ModelImporter:
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
     useFileScale: 1
+    previousCalculatedGlobalScale: 0.001
+    hasPreviousCalculatedGlobalScale: 1
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0

@@ -60,12 +60,12 @@ public class main : MonoBehaviour
         if (Input.GetKey("left shift"))
         {
             useZLookCam();
-            isZLook = true;
+
         }
         if (Input.GetKeyUp("left shift"))
         {
             useNormalCam();
-            isZLook = false;
+
         }
         if (visualJoyStick.touch)
         {
@@ -78,11 +78,13 @@ public class main : MonoBehaviour
         if (Input.GetKey("w"))
         {
             newDirect = transformJoyStickSpace(Vector2.up, cam.transform);
+
             Player.MoveTo(newDirect * 0.5f * KeyboardMoveSpeed);//fixme:0.25要放到外部控制
         }
         if (Input.GetKey("a"))
         {
             newDirect = transformJoyStickSpace(Vector2.left, cam.transform);
+            if (isZLook) newDirect = transformJoyStickSpace(newDirect, camZLook.transform);
             Player.MoveTo(newDirect * 0.5f * KeyboardMoveSpeed);//fixme:0.25要放到外部控制
         }
         if (Input.GetKey("s"))
@@ -93,6 +95,7 @@ public class main : MonoBehaviour
         if (Input.GetKey("d"))
         {
             newDirect = transformJoyStickSpace(Vector2.right, cam.transform);
+            if (isZLook) newDirect = transformJoyStickSpace(newDirect, camZLook.transform);
             Player.MoveTo(newDirect * 0.5f * KeyboardMoveSpeed);//fixme:0.25要放到外部控制s
         }
         if (Input.GetAxis("Mouse ScrollWheel") > 0)
@@ -120,6 +123,7 @@ public class main : MonoBehaviour
     }
     private void useZLookCam()
     {
+        isZLook = true;
         cam.gameObject.SetActive(false);
         camZLook.gameObject.SetActive(true);
     }
@@ -128,6 +132,7 @@ public class main : MonoBehaviour
         cam.setPos(camZLook.transform);
         cam.gameObject.SetActive(true);
         camZLook.gameObject.SetActive(false);
+        isZLook = false;
     }
 
     //將 參數一 的2D向量，改為 參數二 Transform為座標空間

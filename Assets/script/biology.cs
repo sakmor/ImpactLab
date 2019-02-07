@@ -10,7 +10,8 @@ public class biology : MonoBehaviour
     [SerializeField] internal bool IsPunchNext;
     [SerializeField] internal bool IsMoveable = true;
     private Vector3 GoalPos;
-    [SerializeField] private float Speed;
+    [SerializeField]
+    private float Speed;
     [SerializeField] private Renderer ModelRender;
     private Material Material;
     [SerializeField] private float MoveStep;
@@ -169,13 +170,13 @@ public class biology : MonoBehaviour
         if (IsMoveable == false) return;
 
         GoalPos = transform.position + direct;
-        Speed = direct.magnitude;
-
+        SetSpeed(direct.magnitude);
         transform.position = Vector3.MoveTowards(transform.position, GoalPos, Speed * Time.deltaTime);
         faceTarget(GoalPos, Speed * 10.0f);
-        float threshold = 0.9f;
-        if (Speed <= threshold) PlayAnimation(AnimationState.Walking);
-        if (Speed > threshold) PlayAnimation(AnimationState.Running);
+        Animator.SetBool("IsMove", true);
+        // float threshold = 0.9f;
+        // if (Speed <= threshold) PlayAnimation(AnimationState.Walking);
+        // if (Speed > threshold) PlayAnimation(AnimationState.Running);
 
     }
 
@@ -201,7 +202,7 @@ public class biology : MonoBehaviour
     {
         if (AnimationStates == AnimationState.Punching_1) return;
         if (AnimationStates == AnimationState.Punching_2) return;
-        PlayAnimation(AnimationState.Idle);
+        SetSpeed(0);
     }
 
 
@@ -312,6 +313,12 @@ public class biology : MonoBehaviour
             yield return null;
         }
         transform.position = _position;
+    }
+    private void SetSpeed(float t)
+    {
+        Speed = t;
+        Animator.SetFloat("MoveSpeed", Speed);
+
     }
 
 }
