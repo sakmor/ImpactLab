@@ -4,11 +4,12 @@ using UnityEngine.UI;
 
 public class main : MonoBehaviour
 {
-    private float KeyboardMoveSpeed = 3.5f;
-    [SerializeField] private biology Player;
+    private float KeyboardMoveSpeed = 1f;
+    [SerializeField] private Biology Player;
     [SerializeField] internal float ShakeTimes, ShakePower;
     [SerializeField] private GameObject TaregtMark;
-    internal GameObject[] EmenyBiologys;
+    internal Biology[] AllBiologys;
+
     private GameObject target;
     bool isZLook;
     [SerializeField] private UnityEngine.UI.Slider Slider;
@@ -21,7 +22,7 @@ public class main : MonoBehaviour
 
     [SerializeField] public cameraScript cam;
     [SerializeField] private cameraZLookScript camZLook;
-    [SerializeField] private visualJoyStick visualJoyStick;
+    [SerializeField] private VisualJoyStick VisualJoyStick;
     [SerializeField]
     internal List<GameObject> Effects = new List<GameObject>();
 
@@ -29,8 +30,8 @@ public class main : MonoBehaviour
     private void Start()
     {
         UpdateSettingValue();
-        EmenyBiologys = GameObject.FindGameObjectsWithTag("blue");
         SetupCameraSystem();
+        AllBiologys = FindObjectsOfType<Biology>();
 
     }
 
@@ -38,7 +39,6 @@ public class main : MonoBehaviour
     private void Update()
     {
         controlPlayer();
-        Player.searchClosetTarget();
         showTarget();
     }
 
@@ -50,6 +50,7 @@ public class main : MonoBehaviour
 
     private void showTarget()
     {
+        if (Player.Target == null) { return; }
         TaregtMark.transform.position = Player.Target.transform.position + Vector3.up * 1.2f;
     }
 
@@ -67,36 +68,37 @@ public class main : MonoBehaviour
             useNormalCam();
 
         }
-        if (visualJoyStick.touch)
+        if (VisualJoyStick.IsTouch)
         {
             //如果沒在注視模式時，使用一般攝影機座標
-            newDirect = transformJoyStickSpace(visualJoyStick.joyStickVec, cam.transform);
+            newDirect = transformJoyStickSpace(VisualJoyStick.joyStickVec, cam.transform);
             //如果正在注視模式時，使用注視攝影機座標
-            if (isZLook) newDirect = transformJoyStickSpace(visualJoyStick.joyStickVec, camZLook.transform);
-            Player.MoveTo(newDirect / 2.0f);//fixme:0.25要放到外部控制
+            if (isZLook) newDirect = transformJoyStickSpace(VisualJoyStick.joyStickVec, camZLook.transform);
+            Player.MoveTo(newDirect);
         }
+
         if (Input.GetKey("w"))
         {
             newDirect = transformJoyStickSpace(Vector2.up, cam.transform);
 
-            Player.MoveTo(newDirect * 0.5f * KeyboardMoveSpeed);//fixme:0.25要放到外部控制
+            Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetKey("a"))
         {
             newDirect = transformJoyStickSpace(Vector2.left, cam.transform);
             if (isZLook) newDirect = transformJoyStickSpace(newDirect, camZLook.transform);
-            Player.MoveTo(newDirect * 0.5f * KeyboardMoveSpeed);//fixme:0.25要放到外部控制
+            Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetKey("s"))
         {
             newDirect = transformJoyStickSpace(Vector2.down, cam.transform);
-            Player.MoveTo(newDirect * 0.5f * KeyboardMoveSpeed);//fixme:0.25要放到外部控制
+            Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetKey("d"))
         {
             newDirect = transformJoyStickSpace(Vector2.right, cam.transform);
             if (isZLook) newDirect = transformJoyStickSpace(newDirect, camZLook.transform);
-            Player.MoveTo(newDirect * 0.5f * KeyboardMoveSpeed);//fixme:0.25要放到外部控制s
+            Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetAxis("Mouse ScrollWheel") > 0)
         {

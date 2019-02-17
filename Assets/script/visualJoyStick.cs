@@ -2,81 +2,110 @@
 using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using UnityEngine;
+using System;
 
-public class visualJoyStick : MonoBehaviour
+public class VisualJoyStick : MonoBehaviour, IPointerDownHandler
 {
-    public bool touch;
+
+    private float Width, WidthHalf;
+    private float Height, HeightHalf;
+    private RectTransform RectTransform;
+    [SerializeField] private Transform Stick;
+    [SerializeField] internal bool IsTouch;
     public Vector2 joyStickVec;
     // Use this for initialization
-    public string hitUIObjectName = "";
-    GameObject hitUIObject;
+
+    Sprite Sprite;
+    Vector2 imageScale;
     void Start()
     {
-        touch = false;
         joyStickVec = Vector2.zero;
+        RectTransform = GetComponent<RectTransform>();
+        Sprite = GetComponent<UnityEngine.UI.Image>().sprite;
+        imageScale = GetComponent<RectTransform>().localScale;
+        IsTouch = false;
+
+
+        Width = RectTransform.sizeDelta.x;
+        Height = RectTransform.sizeDelta.y;
+        WidthHalf = Width * 0.5f;
+        HeightHalf = Height * 0.5f;
+    }
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (GetUiAlpha() > 0) IsTouch = true;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButton(0))
-        {
-            if (EventSystem.current.IsPointerOverGameObject())
-            {
-                hitUIObject = EventSystem.current.currentSelectedGameObject;
-                if (hitUIObject)
-                {
-                    hitUIObjectName = hitUIObject.name;
-                }
-                else
-                {
-                    hitUIObjectName = "";
-                }
-            }
+        UpdateJoyStickVec();
 
-            if (hitUIObjectName == this.name)
-            {
-                Rect _rect = hitUIObject.GetComponentInParent<RectTransform>().rect;
-                Vector2 temp;
-                temp.x = Input.mousePosition.x - hitUIObject.transform.position.x + _rect.width * 0.5f;
-                temp.y = Input.mousePosition.y - hitUIObject.transform.position.y + _rect.height * 0.5f;
-                Vector2 imageScale = hitUIObject.GetComponent<RectTransform>().localScale;
-                Sprite _sprite = hitUIObject.GetComponent<UnityEngine.UI.Image>().sprite;
-                Color UIObjectRGB;
-                UIObjectRGB = _sprite.texture.GetPixel(Mathf.FloorToInt(temp.x * _sprite.texture.width / (_rect.width * imageScale.x)), Mathf.FloorToInt(temp.y * _sprite.texture.height / (_rect.height * imageScale.y)));
+    }
 
-                //取得使用者滑鼠點擊處的Alpha值(為了不規則的按鈕)
-                if (UIObjectRGB.a != 0
-                    && Vector2.Distance(Input.mousePosition, hitUIObject.transform.position) < _rect.width * 0.5)
-                {
-                    touch = true;
-                    transform.Find("stick").transform.position = Input.mousePosition;
-                }
-                else if (touch)
-                {
-                    //如果拖拉滑鼠盤脫離搖桿盤的範圍，取得圓的交點
-                    Vector2 a = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-                    Vector2 b = new Vector2(hitUIObject.transform.position.x, hitUIObject.transform.position.y);
-                    Vector3 c = new Vector3(hitUIObject.transform.position.x, hitUIObject.transform.position.y, _rect.width * 0.5f);
-                    Vector2 x = getIntersections(a.x, a.y, b.x, b.y, c.x, c.y, c.z);
-                    GameObject.Find("stick").transform.position = new Vector3(x.x, x.y, 0);
-                }
-                joyStickVec = GameObject.Find("stick").transform.position - this.transform.position;
-                joyStickVec.x /= 50;
-                joyStickVec.y /= 50;
-            }
-        }
-        else
+    private void UpdateJoyStickVec()
+    {
+        //如果滑鼠為點擊或點擊到的介面不是此搖桿則跳出程式
+        if (Input.GetMouseButton(0) == false)
         {
-            joyStickVec = Vector2.zero;
-            hitUIObjectName = "";
-            touch = false;
-            GameObject.Find("stick").transform.position = this.transform.position;
+            IsTouch = false; RestJoyStick(); ;
         }
+
+        if (IsTouch == false) return;
+        //取得使用者滑鼠點擊處的Alpha值(為了不規則的按鈕)
+        float UIAlpha = GetUiAlpha();
+
+        //如果點擊處的Alpha不為零，且滑鼠還在搖桿盤內
+        if (UIAlpha != 0 && Vector2.Distance(Input.mousePosition, transform.position) < WidthHalf)
+        {
+            Stick.position = Input.mousePosition;
+            GetJoyStickVec();
+            return;
+        }
+        //如果滑鼠拖曳出搖桿盤內
+        if (Vector2.Distance(Input.mousePosition, transform.position) > WidthHalf)
+        {
+            //如果拖拉滑鼠盤脫離搖桿盤的範圍，取得圓的交點
+            GetIntersections();
+            GetJoyStickVec();
+            return;
+        }
+
+    }
+
+    private void GetIntersections()
+    {
+        Vector2 a = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
+        Vector2 b = new Vector2(transform.position.x, transform.position.y);
+        Vector3 c = new Vector3(transform.position.x, transform.position.y, WidthHalf);
+        Vector2 x = _getIntersections(a.x, a.y, b.x, b.y, c.x, c.y, c.z);
+        Stick.transform.position = new Vector3(x.x, x.y, 0);
+    }
+
+    private void GetJoyStickVec()
+    {
+        joyStickVec = Stick.transform.position - this.transform.position;
+        joyStickVec.x /= WidthHalf;
+        joyStickVec.y /= HeightHalf;
+    }
+
+    private void RestJoyStick()
+    {
+        joyStickVec = Vector2.zero;
+        Stick.transform.position = this.transform.position;
+    }
+
+    private float GetUiAlpha()
+    {
+        Vector2 temp;
+        temp.x = Input.mousePosition.x - transform.position.x + WidthHalf;
+        temp.y = Input.mousePosition.y - transform.position.y + HeightHalf;
+        Color result = Sprite.texture.GetPixel(Mathf.FloorToInt(temp.x * Sprite.texture.width / (Width * imageScale.x)), Mathf.FloorToInt(temp.y * Sprite.texture.height / (Height * imageScale.y)));
+        return result.a;
     }
 
     //取得交點用
-    Vector2 getIntersections(float ax, float ay, float bx, float by, float cx, float cy, float cz)
+    Vector2 _getIntersections(float ax, float ay, float bx, float by, float cx, float cy, float cz)
     {
         float[] a = { ax, ay }, b = { bx, by }, c = { cx, cy, cz };
         // Calculate the euclidean distance between a & b
@@ -113,8 +142,8 @@ public class visualJoyStick : MonoBehaviour
             //        f.onLine = is_on (a, b, f.coords);
 
             // compute second intersection point
-            var gcoords0 = ((t + dt) * d[0]) + a[0];
-            var gcoords1 = ((t + dt) * d[1]) + a[1];
+            // var gcoords0 = ((t + dt) * d[0]) + a[0];
+            // var gcoords1 = ((t + dt) * d[1]) + a[1];
             Vector2 finalAnswer = new Vector2(fcoords0, fcoords1);
 
             // check if g lies on the line
@@ -122,7 +151,7 @@ public class visualJoyStick : MonoBehaviour
 
         }
 
-        return (new Vector2());
+        return Vector2.zero;
 
     }
 

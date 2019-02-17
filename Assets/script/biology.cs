@@ -3,26 +3,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class biology : MonoBehaviour
+public class Biology : MonoBehaviour
 {
     [SerializeField] internal main Main;
     private float HitStopTime;
     private Vector3 GoalPos;
-    [SerializeField]
-    private float Speed;
-    [SerializeField] private Renderer ModelRender;
+    [SerializeField] private float Speed;
+
     private Material Material;
-    [SerializeField] private float MoveStep;
-    public biology Target;
+    [SerializeField] private float WalkStep, RunStep;
+    public Biology Target;
     public bool isRandom;
     [SerializeField] private AnimationState AnimationStates;
     [SerializeField] internal Transform CameraPoint;
     [SerializeField] internal Animator Animator;
-
-
+    [SerializeField] private Renderer ModelRender;
 
     public bool IsAttackable;
 
+    [SerializeField] private Animation[] Animations;
     public enum AnimationState
     {
         Idle, Walking, Running, Punching_1, Punching_2, Punching_3, HurtLeft, HurtRight
@@ -33,18 +32,20 @@ public class biology : MonoBehaviour
         InvokeRepeating("randomMove", 1f, UnityEngine.Random.Range(3f, 5f));
         Material = Instantiate(ModelRender.materials[0]);
         ModelRender.materials[0] = ModelRender.materials[1] = Material;
+
     }
     private void Update()
     {
 
     }
 
-    internal void searchClosetTarget()
+    internal void SearchCloseBiology()
     {
         float dist = Mathf.Infinity;
-        GameObject tempTarget = null;
-        foreach (var t in Main.EmenyBiologys)
+        Biology tempTarget = null;
+        foreach (var t in Main.AllBiologys)
         {
+            if (t == this) return;
             float temp = Vector3.Distance(t.transform.position, transform.position);
             if (temp < dist)
             {
@@ -52,8 +53,13 @@ public class biology : MonoBehaviour
                 dist = temp;
             }
         }
-        Target = tempTarget.GetComponent<biology>();
+        SetTaregt(tempTarget);
 
+    }
+
+    private void SetTaregt(Biology t)
+    {
+        Target = t;
     }
 
     internal void SpaceButtonDown()
@@ -89,7 +95,8 @@ public class biology : MonoBehaviour
     internal void SetIsHurtLeftFalse() { Animator.SetBool("IsHurtLeft", false); }
     internal void SetIsHurtRightTrue() { Animator.SetBool("IsHurtRight", true); }
     internal void SetIsHurtRightFalse() { Animator.SetBool("IsHurtRight", false); }
-    private void SetMoveSpeed(float t) { Speed = t; Animator.SetFloat("MoveSpeed", Speed); }
+    internal void SetSpeedPercent(float t) { Animator.SetFloat("SpeedPercent", t); }
+    private void SetMoveSpeed(float t) { Animator.SetFloat("MoveSpeed", t); }
 
 
     internal void MoveTo(Vector3 direct)
@@ -97,9 +104,13 @@ public class biology : MonoBehaviour
         if (Animator.GetBool("IsMoveable") == false) { SetMoveSpeed(0); return; }
 
         GoalPos = transform.position + direct;
-        SetMoveSpeed(direct.magnitude);
-        transform.position = Vector3.MoveTowards(transform.position, GoalPos, Speed * Time.deltaTime);
-        faceTarget(GoalPos, Speed * 10.0f);
+        SetSpeedPercent(direct.magnitude);
+        float finalSpeed = Speed * (direct.magnitude);
+        SetMoveSpeed(finalSpeed);
+        Animator.SetFloat("WalkStep", WalkStep * finalSpeed);
+        Animator.SetFloat("RunStep", RunStep * finalSpeed);
+        transform.position = Vector3.MoveTowards(transform.position, GoalPos, finalSpeed * Time.deltaTime);
+        FaceTarget(GoalPos, Speed * 10.0f);
 
     }
 
@@ -123,11 +134,18 @@ public class biology : MonoBehaviour
         // if (AnimationStates == AnimationState.Punching_1) return;
         // if (AnimationStates == AnimationState.Punching_2) return;
         // SetIsMoveableFalse();
+        SetSpeedPercent(0);
         SetMoveSpeed(0);
     }
 
+    internal void UpdateAnimationState(AnimationState animationState)
+    {
+        AnimationStates = animationState;
 
-    private void faceTarget(Vector3 etarget, float espeed)
+    }
+
+
+    private void FaceTarget(Vector3 etarget, float espeed)
     {
         Vector3 targetDir = etarget - this.transform.position;
         float step = espeed * Time.deltaTime;
@@ -138,8 +156,8 @@ public class biology : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        if (other.transform.root.GetComponent<biology>() == null) return;
-        biology hitMeBiology = other.transform.root.GetComponent<biology>();
+        if (other.transform.root.GetComponent<Biology>() == null) return;
+        Biology hitMeBiology = other.transform.root.GetComponent<Biology>();
         if (hitMeBiology == this) return;
 
         AnimationState AnimationStates = hitMeBiology.AnimationStates;

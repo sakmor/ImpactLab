@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class cameraZLookScript : MonoBehaviour
 {
-    private biology BiologyPlayer;
+    private Biology BiologyPlayer;
     Vector3 cam2Target;
 
 
@@ -40,7 +40,7 @@ public class cameraZLookScript : MonoBehaviour
         BiologyPlayer.transform.LookAt(BiologyPlayer.Target.transform.position);
     }
 
-    public void SetPlayer(biology player)
+    public void SetPlayer(Biology player)
     {
         BiologyPlayer = player;
     }
