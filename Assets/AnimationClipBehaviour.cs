@@ -8,11 +8,11 @@ public class AnimationClipBehaviour : StateMachineBehaviour
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        Biology.AnimationState CurrentAnimationState;
-        Biology biology = animator.GetComponent<Biology>();
-        var name = animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
-        CurrentAnimationState = (Biology.AnimationState)System.Enum.Parse(typeof(Biology.AnimationState), name, false);
-        biology.SetAnimationStates(CurrentAnimationState);
+        // Biology.AnimationState CurrentAnimationState;
+        // Biology biology = animator.GetComponent<Biology>();
+        // var name = animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
+        // CurrentAnimationState = (Biology.AnimationState)System.Enum.Parse(typeof(Biology.AnimationState), name, false);
+        // biology.SetAnimationStates(CurrentAnimationState);
 
     }
 
