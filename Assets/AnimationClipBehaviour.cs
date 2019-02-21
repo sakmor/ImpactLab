@@ -4,16 +4,17 @@ using UnityEngine;
 
 public class AnimationClipBehaviour : StateMachineBehaviour
 {
+    public Biology.AnimationState AnimationState;
+    public bool IsPunching;
+    public bool IsPunchNext;
 
     // OnStateEnter is called when a transition starts and the state machine starts to evaluate this state
     override public void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
     {
-        // Biology.AnimationState CurrentAnimationState;
-        // Biology biology = animator.GetComponent<Biology>();
-        // var name = animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
-        // CurrentAnimationState = (Biology.AnimationState)System.Enum.Parse(typeof(Biology.AnimationState), name, false);
-        // biology.SetAnimationStates(CurrentAnimationState);
-
+        Biology biology = animator.GetComponent<Biology>();
+        biology.UpdateAnimationState(AnimationState);
+        animator.SetBool("IsPunching", IsPunching);
+        animator.SetBool("IsPunchNext", IsPunchNext);
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks

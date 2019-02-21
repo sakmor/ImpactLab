@@ -90,11 +90,7 @@ public class Biology : MonoBehaviour
     internal void SetIsPunchNextTrue() { Animator.SetBool("IsPunchNext", true); }
     internal void SetIsPunchNextFalse() { Animator.SetBool("IsPunchNext", false); }
     internal void SetIsPunchingTrue() { Animator.SetBool("IsPunching", true); }
-    internal void SetIsPunchingFalse() { Animator.SetBool("IsPunching", false); }
-    internal void SetIsHurtLeftTrue() { Animator.SetBool("IsHurtLeft", true); }
-    internal void SetIsHurtLeftFalse() { Animator.SetBool("IsHurtLeft", false); }
-    internal void SetIsHurtRightTrue() { Animator.SetBool("IsHurtRight", true); }
-    internal void SetIsHurtRightFalse() { Animator.SetBool("IsHurtRight", false); }
+
     internal void SetSpeedPercent(float t) { Animator.SetFloat("SpeedPercent", t); }
     private void SetMoveSpeed(float t) { Animator.SetFloat("MoveSpeed", t); }
 
@@ -138,7 +134,7 @@ public class Biology : MonoBehaviour
         SetMoveSpeed(0);
     }
 
-    internal void UpdateAnimationState(AnimationState animationState)
+    public void UpdateAnimationState(AnimationState animationState)
     {
         AnimationStates = animationState;
 
@@ -160,12 +156,14 @@ public class Biology : MonoBehaviour
         Biology hitMeBiology = other.transform.root.GetComponent<Biology>();
         if (hitMeBiology == this) return;
 
-        AnimationState AnimationStates = hitMeBiology.AnimationStates;
+        AnimationState hitMeBiologyAnimationStates = hitMeBiology.AnimationStates;
 
         if (hitMeBiology.IsAttackable == false) return;
+        // if (hitMeBiologyAnimationStates != Biology.AnimationState.Punching_1 || hitMeBiologyAnimationStates != Biology.AnimationState.Punching_2) return;
 
-        if (other.gameObject.name == "SphereRight") SetIsHurtRightTrue();
-        if (other.gameObject.name == "SphereLeft") SetIsHurtLeftTrue();
+        if (hitMeBiologyAnimationStates == Biology.AnimationState.Punching_1) Animator.Play("HurtRight", -1, 0f);//SetIsHurtRightTrue();
+        if (hitMeBiologyAnimationStates == Biology.AnimationState.Punching_2) Animator.Play("HurtLeft", -1, 0f);// SetIsHurtLeftTrue();
+
         transform.LookAt(other.transform.root);
         transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
 

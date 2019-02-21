@@ -110,7 +110,7 @@ public class main : MonoBehaviour
             KeyboardMoveSpeed -= 0.1f;
             KeyboardMoveSpeed = Mathf.Clamp(KeyboardMoveSpeed, 1, 6);
         }
-        if (Input.GetMouseButton(1))
+        if (Input.GetMouseButtonDown(1))
         {
             Player.AttackButtonDown();
         }
