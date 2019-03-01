@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class cameraZLookScript : MonoBehaviour
+public class CameraZLookScript : MonoBehaviour
 {
     private Biology BiologyPlayer;
     Vector3 cam2Target;

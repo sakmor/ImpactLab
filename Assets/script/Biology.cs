@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Biology : MonoBehaviour
 {
-    [SerializeField] internal main Main;
+    [SerializeField] internal Main Main;
     private float HitStopTime;
     private Vector3 GoalPos;
     [SerializeField] private float Speed;
@@ -175,7 +175,7 @@ public class Biology : MonoBehaviour
 
         hitMeBiology.SetIsAttackableFalse();// 這項目控制這一次動畫傷害是否只算一次
 
-        if (Main.IsCameraShake) Main.cam.StartShake(other);
+        if (Main.IsCameraShake) Main.Cam.StartShake(other);
 
         if (Main.IsHittedFx == false) return;
 

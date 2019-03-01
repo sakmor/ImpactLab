@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class main : MonoBehaviour
+public class Main : MonoBehaviour
 {
     private float KeyboardMoveSpeed = 1f;
     [SerializeField] private Biology Player;
@@ -20,8 +20,8 @@ public class main : MonoBehaviour
     [SerializeField] internal float HitStopTime;
     public bool IsCameraShake, IsHittedShake, IsHittedFlash, IsHittedFx;
 
-    [SerializeField] public cameraScript cam;
-    [SerializeField] private cameraZLookScript camZLook;
+    [SerializeField] public CameraScript Cam;
+    [SerializeField] private CameraZLookScript CamZook;
     [SerializeField] private VisualJoyStick VisualJoyStick;
     [SerializeField]
     internal List<GameObject> Effects = new List<GameObject>();
@@ -44,8 +44,8 @@ public class main : MonoBehaviour
 
     private void SetupCameraSystem()
     {
-        cam.setTarget(Player.CameraPoint);
-        camZLook.SetPlayer(Player);
+        Cam.setTarget(Player.CameraPoint);
+        CamZook.SetPlayer(Player);
     }
 
     private void showTarget()
@@ -71,33 +71,33 @@ public class main : MonoBehaviour
         if (VisualJoyStick.IsTouch)
         {
             //如果沒在注視模式時，使用一般攝影機座標
-            newDirect = transformJoyStickSpace(VisualJoyStick.joyStickVec, cam.transform);
+            newDirect = transformJoyStickSpace(VisualJoyStick.joyStickVec, Cam.transform);
             //如果正在注視模式時，使用注視攝影機座標
-            if (isZLook) newDirect = transformJoyStickSpace(VisualJoyStick.joyStickVec, camZLook.transform);
+            if (isZLook) newDirect = transformJoyStickSpace(VisualJoyStick.joyStickVec, CamZook.transform);
             Player.MoveTo(newDirect);
         }
 
         if (Input.GetKey("w"))
         {
-            newDirect = transformJoyStickSpace(Vector2.up, cam.transform);
+            newDirect = transformJoyStickSpace(Vector2.up, Cam.transform);
 
             Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetKey("a"))
         {
-            newDirect = transformJoyStickSpace(Vector2.left, cam.transform);
-            if (isZLook) newDirect = transformJoyStickSpace(newDirect, camZLook.transform);
+            newDirect = transformJoyStickSpace(Vector2.left, Cam.transform);
+            if (isZLook) newDirect = transformJoyStickSpace(newDirect, CamZook.transform);
             Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetKey("s"))
         {
-            newDirect = transformJoyStickSpace(Vector2.down, cam.transform);
+            newDirect = transformJoyStickSpace(Vector2.down, Cam.transform);
             Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetKey("d"))
         {
-            newDirect = transformJoyStickSpace(Vector2.right, cam.transform);
-            if (isZLook) newDirect = transformJoyStickSpace(newDirect, camZLook.transform);
+            newDirect = transformJoyStickSpace(Vector2.right, Cam.transform);
+            if (isZLook) newDirect = transformJoyStickSpace(newDirect, CamZook.transform);
             Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetAxis("Mouse ScrollWheel") > 0)
@@ -126,14 +126,14 @@ public class main : MonoBehaviour
     private void useZLookCam()
     {
         isZLook = true;
-        cam.gameObject.SetActive(false);
-        camZLook.gameObject.SetActive(true);
+        Cam.gameObject.SetActive(false);
+        CamZook.gameObject.SetActive(true);
     }
     private void useNormalCam()
     {
-        cam.setPos(camZLook.transform);
-        cam.gameObject.SetActive(true);
-        camZLook.gameObject.SetActive(false);
+        Cam.setPos(CamZook.transform);
+        Cam.gameObject.SetActive(true);
+        CamZook.gameObject.SetActive(false);
         isZLook = false;
     }
 
