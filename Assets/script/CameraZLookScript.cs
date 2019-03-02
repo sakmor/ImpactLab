@@ -4,18 +4,19 @@ using UnityEngine;
 
 public class CameraZLookScript : MonoBehaviour
 {
+    [SerializeField] Main Main;
     private Biology BiologyPlayer;
     Vector3 cam2Target;
 
 
     // Use this for initialization
-    void Start()
+    private void Start()
     {
 
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         set2FollwTargetBack();
         // transform.LookAt(lookTarget.transform.Find("N1").gameObject.transform);
@@ -29,8 +30,9 @@ public class CameraZLookScript : MonoBehaviour
     //     cam2Target = transform.position - followTarget.transform.position;
     // }
 
-    void set2FollwTargetBack()
+    private void set2FollwTargetBack()
     {
+        SetPlayer(Main.Player);
         Vector3 back = BiologyPlayer.Target.transform.position - BiologyPlayer.transform.position;
         back = new Vector3(back.x, 0, back.z);
         back = Vector3.Normalize(back);

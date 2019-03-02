@@ -18,6 +18,7 @@ public class Biology : MonoBehaviour
     [SerializeField] internal Transform CameraPoint;
     [SerializeField] internal Animator Animator;
     [SerializeField] private Renderer ModelRender;
+    [SerializeField] internal Transform N1;
 
     public bool IsAttackable;
 
@@ -36,7 +37,12 @@ public class Biology : MonoBehaviour
     }
     private void Update()
     {
+        SearchCloseBiology();
+    }
+    private void LateUpdate()
+    {
 
+        StopWalking();
     }
 
     internal void SearchCloseBiology()
@@ -52,9 +58,8 @@ public class Biology : MonoBehaviour
                 tempTarget = t;
                 dist = temp;
             }
+            SetTaregt(tempTarget);
         }
-        SetTaregt(tempTarget);
-
     }
 
     private void SetTaregt(Biology t)

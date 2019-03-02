@@ -5,10 +5,10 @@ using UnityEngine.UI;
 public class Main : MonoBehaviour
 {
     private float KeyboardMoveSpeed = 1f;
-    [SerializeField] private Biology Player;
+    [SerializeField] internal Biology Player;
     [SerializeField] internal float ShakeTimes, ShakePower;
     [SerializeField] private GameObject TaregtMark;
-    internal Biology[] AllBiologys;
+    [SerializeField] internal Biology[] AllBiologys;
 
     private GameObject target;
     bool isZLook;
@@ -118,10 +118,7 @@ public class Main : MonoBehaviour
         {
             Player.SpaceButtonDown();
         }
-        if (Input.anyKey == false)
-        {
-            Player.StopWalking();
-        }
+
     }
     private void useZLookCam()
     {
