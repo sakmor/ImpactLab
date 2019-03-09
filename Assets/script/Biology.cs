@@ -13,14 +13,13 @@ public class Biology : MonoBehaviour
     private Material Material;
     [SerializeField] private float WalkStep, RunStep;
     public Biology Target;
-    public bool isRandom;
+    public bool IsRandom, IsMove, IsAttackable, IsZLook;
     [SerializeField] private AnimationState AnimationStates;
     [SerializeField] internal Transform CameraPoint;
     [SerializeField] internal Animator Animator;
     [SerializeField] private Renderer ModelRender;
     [SerializeField] internal Transform N1;
 
-    public bool IsAttackable;
 
     [SerializeField] private Animation[] Animations;
     public enum AnimationState
@@ -32,17 +31,18 @@ public class Biology : MonoBehaviour
         GoalPos = transform.position;
         InvokeRepeating("randomMove", 1f, UnityEngine.Random.Range(3f, 5f));
         Material = Instantiate(ModelRender.materials[0]);
+        //fixme:這樣的寫法太死了
         ModelRender.materials[0] = ModelRender.materials[1] = Material;
 
     }
     private void Update()
     {
-        SearchCloseBiology();
+        if (IsZLook == false) SearchCloseBiology();
+        if (IsMove == false) StopWalking();
     }
     private void LateUpdate()
     {
-
-        StopWalking();
+        IsMove = false;
     }
 
     internal void SearchCloseBiology()
@@ -80,7 +80,7 @@ public class Biology : MonoBehaviour
 
     void randomMove()
     {
-        if (isRandom)
+        if (IsRandom)
         {
             int n = UnityEngine.Random.Range(1, 4);
             GoalPos = GameObject.Find("w" + n).transform.position; //fixme:不要在用Find了
@@ -95,21 +95,24 @@ public class Biology : MonoBehaviour
     internal void SetIsPunchNextTrue() { Animator.SetBool("IsPunchNext", true); }
     internal void SetIsPunchNextFalse() { Animator.SetBool("IsPunchNext", false); }
     internal void SetIsPunchingTrue() { Animator.SetBool("IsPunching", true); }
-
+    internal void SetIsZookTrue() { Animator.SetBool("IsZLook", true); IsZLook = true; }
+    internal void SetIsZookFalse() { Animator.SetBool("IsZLook", false); IsZLook = false; }
     internal void SetSpeedPercent(float t) { Animator.SetFloat("SpeedPercent", t); }
     private void SetMoveSpeed(float t) { Animator.SetFloat("MoveSpeed", t); }
 
 
     internal void MoveTo(Vector3 direct)
     {
-        if (Animator.GetBool("IsMoveable") == false) { SetMoveSpeed(0); return; }
 
-        GoalPos = transform.position + direct;
+        if (Animator.GetBool("IsMoveable") == false) { SetMoveSpeed(0); return; }
+        IsMove = true;
+        GoalPos = transform.position + direct.normalized;
         SetSpeedPercent(direct.magnitude);
         float finalSpeed = Speed * (direct.magnitude);
         SetMoveSpeed(finalSpeed);
         Animator.SetFloat("WalkStep", WalkStep * finalSpeed);
         Animator.SetFloat("RunStep", RunStep * finalSpeed);
+
         transform.position = Vector3.MoveTowards(transform.position, GoalPos, finalSpeed * Time.deltaTime);
         FaceTarget(GoalPos, Speed * 10.0f);
 

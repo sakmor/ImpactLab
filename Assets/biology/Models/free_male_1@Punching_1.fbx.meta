@@ -99,7 +99,8 @@ ModelImporter:
     rigImportErrors: 
     rigImportWarnings: 
     animationImportErrors: 
-    animationImportWarnings: 
+    animationImportWarnings: Event SetIsMoveableTrue has a time (0.505797) outside
+      the clip's valid range (0.000000..0.500000). It will never be fired
     animationRetargetingWarnings: 
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
@@ -164,7 +165,7 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.556
+      - time: 0.54133725
         functionName: SetIsMoveableTrue
         data: 
         objectReferenceParameter: {instanceID: 0}

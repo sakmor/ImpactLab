@@ -150,7 +150,7 @@ ModelImporter:
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
-      - time: 0.72
+      - time: 0.805044
         functionName: SetIsMoveableTrue
         data: 
         objectReferenceParameter: {instanceID: 0}

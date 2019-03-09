@@ -11,7 +11,7 @@ public class Main : MonoBehaviour
     [SerializeField] internal Biology[] AllBiologys;
 
     private GameObject target;
-    bool isZLook;
+    bool IsZlook;
     [SerializeField] private UnityEngine.UI.Slider Slider;
     [SerializeField] private UnityEngine.UI.Toggle CameraShake_Toggle;
     [SerializeField] private UnityEngine.UI.Toggle HittedShake_Toggle;
@@ -61,43 +61,43 @@ public class Main : MonoBehaviour
         if (Input.GetKey("left shift"))
         {
             useZLookCam();
-
         }
+
         if (Input.GetKeyUp("left shift"))
         {
             useNormalCam();
-
         }
+
+
         if (VisualJoyStick.IsTouch)
         {
-            //如果沒在注視模式時，使用一般攝影機座標
             newDirect = transformJoyStickSpace(VisualJoyStick.joyStickVec, Cam.transform);
-            //如果正在注視模式時，使用注視攝影機座標
-            if (isZLook) newDirect = transformJoyStickSpace(VisualJoyStick.joyStickVec, CamZook.transform);
+            if (IsZlook) newDirect = transformJoyStickSpace(VisualJoyStick.joyStickVec, CamZook.transform);
             Player.MoveTo(newDirect);
         }
 
         if (Input.GetKey("w"))
         {
             newDirect = transformJoyStickSpace(Vector2.up, Cam.transform);
-
+            if (IsZlook) newDirect = Player.transform.forward.normalized;
             Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetKey("a"))
         {
             newDirect = transformJoyStickSpace(Vector2.left, Cam.transform);
-            if (isZLook) newDirect = transformJoyStickSpace(newDirect, CamZook.transform);
+            if (IsZlook) newDirect = -Player.transform.right.normalized;
             Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetKey("s"))
         {
             newDirect = transformJoyStickSpace(Vector2.down, Cam.transform);
+            if (IsZlook) newDirect = -Player.transform.forward.normalized;
             Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetKey("d"))
         {
             newDirect = transformJoyStickSpace(Vector2.right, Cam.transform);
-            if (isZLook) newDirect = transformJoyStickSpace(newDirect, CamZook.transform);
+            if (IsZlook) newDirect = Player.transform.right.normalized;
             Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetAxis("Mouse ScrollWheel") > 0)
@@ -122,16 +122,19 @@ public class Main : MonoBehaviour
     }
     private void useZLookCam()
     {
-        isZLook = true;
+        IsZlook = true;
         Cam.gameObject.SetActive(false);
         CamZook.gameObject.SetActive(true);
+        Player.SetIsZookTrue();
     }
     private void useNormalCam()
     {
+        IsZlook = false;
         Cam.setPos(CamZook.transform);
         Cam.gameObject.SetActive(true);
         CamZook.gameObject.SetActive(false);
-        isZLook = false;
+        Player.SetIsZookFalse();
+
     }
 
     //將 參數一 的2D向量，改為 參數二 Transform為座標空間
