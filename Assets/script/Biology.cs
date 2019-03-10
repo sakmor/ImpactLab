@@ -9,7 +9,6 @@ public class Biology : MonoBehaviour
     private float HitStopTime;
     private Vector3 GoalPos;
     [SerializeField] private float Speed;
-
     private Material Material;
     [SerializeField] private float WalkStep, RunStep;
     public Biology Target;
@@ -18,7 +17,7 @@ public class Biology : MonoBehaviour
     [SerializeField] internal Transform CameraPoint;
     [SerializeField] internal Animator Animator;
     [SerializeField] private Renderer ModelRender;
-    [SerializeField] internal Transform N1;
+    [SerializeField] internal Transform N1, N2;
 
 
     [SerializeField] private Animation[] Animations;
@@ -31,7 +30,7 @@ public class Biology : MonoBehaviour
         GoalPos = transform.position;
         InvokeRepeating("randomMove", 1f, UnityEngine.Random.Range(3f, 5f));
         Material = Instantiate(ModelRender.materials[0]);
-        //fixme:這樣的寫法太死了
+        //fixme:這樣的寫法太死了，應該有多少材質都可以自動偵測
         ModelRender.materials[0] = ModelRender.materials[1] = Material;
 
     }
@@ -51,13 +50,12 @@ public class Biology : MonoBehaviour
         Biology tempTarget = null;
         foreach (var t in Main.AllBiologys)
         {
-            if (t == this) return;
+            if (t == this) continue;
             float temp = Vector3.Distance(t.transform.position, transform.position);
-            if (temp < dist)
-            {
-                tempTarget = t;
-                dist = temp;
-            }
+
+            if (temp > dist) continue;
+            tempTarget = t;
+            dist = temp;
             SetTaregt(tempTarget);
         }
     }

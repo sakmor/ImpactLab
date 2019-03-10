@@ -5,21 +5,21 @@ using UnityEngine;
 public class CameraZLookScript : MonoBehaviour
 {
     [SerializeField] Main Main;
-    private Biology BiologyPlayer;
-    Vector3 cam2Target;
+    private Vector3 cam2Target;
+
 
 
     // Use this for initialization
     private void Start()
     {
-
+        cam2Target = transform.position - Main.Player.transform.position;
     }
 
     // Update is called once per frame
-    private void Update()
+    private void LateUpdate()
     {
-        set2FollwTargetBack();
-        // transform.LookAt(lookTarget.transform.Find("N1").gameObject.transform);
+        transform.LookAt(Main.Player.Target.CameraPoint.gameObject.transform);
+        // transform.position = Main.Player.transform.position + cam2Target;
     }
     // void cameraFollow()
     // {
@@ -30,21 +30,17 @@ public class CameraZLookScript : MonoBehaviour
     //     cam2Target = transform.position - followTarget.transform.position;
     // }
 
-    private void set2FollwTargetBack()
+    internal void set2FollwTargetBack()
     {
-        SetPlayer(Main.Player);
-        Vector3 back = BiologyPlayer.Target.transform.position - BiologyPlayer.transform.position;
+
+        Vector3 back = Main.Player.Target.transform.position - Main.Player.transform.position;
         back = new Vector3(back.x, 0, back.z);
         back = Vector3.Normalize(back);
         back = back * -1.25f;
-        transform.position = BiologyPlayer.transform.position + back + Vector3.up * 1.25f;
-        transform.LookAt(BiologyPlayer.Target.transform.Find("N1").position);
-        BiologyPlayer.transform.LookAt(BiologyPlayer.Target.transform.position);
+        transform.position = Main.Player.transform.position + back + Vector3.up * 1.25f;
+        transform.LookAt(Main.Player.Target.transform.Find("N1").position);
+        Main.Player.transform.LookAt(Main.Player.Target.transform.position);
     }
 
-    public void SetPlayer(Biology player)
-    {
-        BiologyPlayer = player;
-    }
 
 }

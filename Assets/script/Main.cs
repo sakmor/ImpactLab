@@ -9,6 +9,7 @@ public class Main : MonoBehaviour
     [SerializeField] internal float ShakeTimes, ShakePower;
     [SerializeField] private GameObject TaregtMark;
     [SerializeField] internal Biology[] AllBiologys;
+    [SerializeField] internal CameraZLookScript CameraZLookScript;
 
     private GameObject target;
     bool IsZlook;
@@ -21,6 +22,7 @@ public class Main : MonoBehaviour
     public bool IsCameraShake, IsHittedShake, IsHittedFlash, IsHittedFx;
 
     [SerializeField] public CameraScript Cam;
+    [SerializeField] public Animator ZlookUIAnimator;
     [SerializeField] private CameraZLookScript CamZook;
     [SerializeField] private VisualJoyStick VisualJoyStick;
     [SerializeField]
@@ -45,7 +47,6 @@ public class Main : MonoBehaviour
     private void SetupCameraSystem()
     {
         Cam.setTarget(Player.CameraPoint);
-        CamZook.SetPlayer(Player);
     }
 
     private void showTarget()
@@ -71,33 +72,28 @@ public class Main : MonoBehaviour
 
         if (VisualJoyStick.IsTouch)
         {
-            newDirect = transformJoyStickSpace(VisualJoyStick.joyStickVec, Cam.transform);
-            if (IsZlook) newDirect = transformJoyStickSpace(VisualJoyStick.joyStickVec, CamZook.transform);
+            newDirect = transformPlayerMoveDirect(VisualJoyStick.joyStickVec);
             Player.MoveTo(newDirect);
         }
 
         if (Input.GetKey("w"))
         {
-            newDirect = transformJoyStickSpace(Vector2.up, Cam.transform);
-            if (IsZlook) newDirect = Player.transform.forward.normalized;
+            newDirect = transformPlayerMoveDirect(Vector2.up);
             Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetKey("a"))
         {
-            newDirect = transformJoyStickSpace(Vector2.left, Cam.transform);
-            if (IsZlook) newDirect = -Player.transform.right.normalized;
+            newDirect = transformPlayerMoveDirect(Vector2.left);
             Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetKey("s"))
         {
-            newDirect = transformJoyStickSpace(Vector2.down, Cam.transform);
-            if (IsZlook) newDirect = -Player.transform.forward.normalized;
+            newDirect = transformPlayerMoveDirect(Vector2.down);
             Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetKey("d"))
         {
-            newDirect = transformJoyStickSpace(Vector2.right, Cam.transform);
-            if (IsZlook) newDirect = Player.transform.right.normalized;
+            newDirect = transformPlayerMoveDirect(Vector2.right);
             Player.MoveTo(newDirect * KeyboardMoveSpeed);
         }
         if (Input.GetAxis("Mouse ScrollWheel") > 0)
@@ -123,36 +119,59 @@ public class Main : MonoBehaviour
     private void useZLookCam()
     {
         IsZlook = true;
-        Cam.gameObject.SetActive(false);
-        CamZook.gameObject.SetActive(true);
+        // Player.transform.LookAt(Player.Target.transform.position);
+        ZlookUIAnimator.SetBool("IsZLook", true);
+        //fixme:GetComponent很耗效能
+        Cam.gameObject.GetComponent<Camera>().enabled = false;
+        CamZook.gameObject.GetComponent<Camera>().enabled = true;
+        CamZook.gameObject.GetComponent<CameraZLookScript>().enabled = true;
         Player.SetIsZookTrue();
     }
     private void useNormalCam()
     {
         IsZlook = false;
-        Cam.setPos(CamZook.transform);
-        Cam.gameObject.SetActive(true);
-        CamZook.gameObject.SetActive(false);
+        ZlookUIAnimator.SetBool("IsZLook", false);
+        // Cam.setPos(CamZook.transform);
+        //fixme:GetComponent很耗效能
+        Cam.gameObject.GetComponent<Camera>().enabled = true;
+        CamZook.gameObject.GetComponent<Camera>().enabled = false;
+        CamZook.gameObject.GetComponent<CameraZLookScript>().enabled = false;
         Player.SetIsZookFalse();
 
     }
 
-    //將 參數一 的2D向量，改為 參數二 Transform為座標空間
-    Vector3 transformJoyStickSpace(Vector2 vec, Transform t)
+    Vector3 transformPlayerMoveDirect(Vector2 vec)
     {
-        //取得Transform t的朝前、朝右向量
-        Vector3 forward = new Vector3(t.transform.forward.x, 0, t.transform.forward.z);
-        Vector3 right = new Vector3(t.transform.right.x, 0, t.transform.right.z);
+        Vector3 forward = Vector3.zero;
+        Vector3 right = Vector3.zero;
 
-        //將左右向量標準化（變成最短）
-        forward = Vector3.Normalize(forward);
-        right = Vector3.Normalize(right);
+        if (IsZlook == true)
+        {
+            // Fixme:
+            // 這裡的繞圈寫法有誤差在，一直繞著目標做橫移會越跑"越遠"或"越近"
+            // 要寫到沒有誤差也不是不可能，只要求出下面數值即可：
+            // --- 假設圓點為 Player.Target.transform.position
+            // --- 該圓半徑為 Vector3.Distance(Player.Target.transform.position,Player.transform.position);
+            // --- 求right向量與圓上之做為新的right，應該就可以了。
+            // --- ....好麻煩...這個誤差應該玩家無法察覺
+
+            forward = Player.Target.transform.position - Player.transform.position;
+            right = Quaternion.AngleAxis(90f - vec.x, Vector3.up) * forward.normalized;
+            float dist = Vector3.Distance(Player.transform.position, Player.Target.transform.position);
+            Debug.Log(dist);
+        }
+
+        if (IsZlook == false)
+        {
+            forward = Cam.transform.forward;
+            right = Cam.transform.right;
+        }
 
         //將標準化左右向量加上搖桿的放大量
         right *= vec.x;
         forward *= vec.y;
 
-        return forward + right;
+        return Vector3.Normalize(forward + right);
     }
 
     public void UpdateSettingValue()

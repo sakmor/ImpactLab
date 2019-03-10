@@ -105,7 +105,7 @@ public class VisualJoyStick : MonoBehaviour, IPointerDownHandler
     }
 
     //取得交點用
-    Vector2 _getIntersections(float ax, float ay, float bx, float by, float cx, float cy, float cz)
+    public Vector2 _getIntersections(float ax, float ay, float bx, float by, float cx, float cy, float cz)
     {
         float[] a = { ax, ay }, b = { bx, by }, c = { cx, cy, cz };
         // Calculate the euclidean distance between a & b

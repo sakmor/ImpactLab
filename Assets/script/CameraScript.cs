@@ -10,8 +10,8 @@ using System.Collections.Generic;
 [AddComponentMenu("Camera-Control/Mouse Orbit with zoom")]
 public class CameraScript : MonoBehaviour
 {
-    [SerializeField] Main Main;
-    bool isZLook;
+    [SerializeField] internal Main Main;
+
     float distance = 2f;
     float xSpeed = 5.0f;
     float ySpeed = 5.0f;
@@ -21,13 +21,12 @@ public class CameraScript : MonoBehaviour
     float distanceMax = 3f;
     public float x = 0.0f, startX = 0.0f, finalX = 0.0f, y = 0.0f;
     Vector3 cam2Target;
-    [SerializeField] private Transform target;
-    private float _targetY;
+    [SerializeField] private Transform Target;
+    private float _TargetY;
 
     // Use this for initialization
     void Start()
     {
-        isZLook = false;
         setAsEditor();
     }
 
@@ -46,8 +45,8 @@ public class CameraScript : MonoBehaviour
         distance = Mathf.Clamp(distance - Input.GetAxis("Mouse ScrollWheel") * 5, distanceMin, distanceMax);
         Vector3 position = rotation * new Vector3(0.0f, 0.0f, -distance);
         transform.rotation = rotation;
-        transform.position = position + target.position;
-        setCame2target();
+        transform.position = position + Target.position;
+        setCame2Target();
     }
 
 
@@ -60,7 +59,7 @@ public class CameraScript : MonoBehaviour
     }
     void cameraFollow()
     {
-        transform.position = target.position + cam2Target;
+        transform.position = Target.position + cam2Target;
     }
     public static float ClampAngle(float angle, float min, float max)
     {
@@ -72,19 +71,19 @@ public class CameraScript : MonoBehaviour
     }
     public void setTarget(Transform n)
     {
-        target = n;
-        _targetY = target.position.y;
+        Target = n;
+        _TargetY = Target.position.y;
         mouseOrbit();
     }
     private void KeepTargetY()
     {
-        Vector3 n = target.transform.position;
-        target.transform.position = new Vector3(n.x, _targetY, n.z);
+        Vector3 n = Target.transform.position;
+        Target.transform.position = new Vector3(n.x, _TargetY, n.z);
     }
 
-    void setCame2target()
+    void setCame2Target()
     {
-        cam2Target = transform.position - target.position;
+        cam2Target = transform.position - Target.position;
     }
     void setAsEditor()
     {
@@ -111,7 +110,7 @@ public class CameraScript : MonoBehaviour
         float waitCounter = 0;
         Vector3 directon = other.transform.up;
         directon = new Vector3(directon.x, 0, directon.z);
-        Vector3 _position = target.localPosition;
+        Vector3 _position = Target.localPosition;
         float lastShakeTime = 0;
         float shakeTimes = Main.HitStopTime / Main.ShakeTimes;
         float _ShakePower = Main.ShakePower;
@@ -122,12 +121,12 @@ public class CameraScript : MonoBehaviour
             if (waitCounter - lastShakeTime >= shakeTimes)
             {
                 lastShakeTime = waitCounter;
-                target.localPosition = _position - directon * _ShakePower;
+                Target.localPosition = _position - directon * _ShakePower;
                 _ShakePower *= UnityEngine.Random.Range(0.5f, 0.9f);
             }
             yield return null;
         }
-        target.localPosition = _position;
+        Target.localPosition = _position;
     }
 
 }
