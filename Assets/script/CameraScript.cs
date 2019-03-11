@@ -27,7 +27,7 @@ public class CameraScript : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        setAsEditor();
+        SetAsEditor();
     }
 
     void LateUpdate()
@@ -36,7 +36,7 @@ public class CameraScript : MonoBehaviour
         KeepTargetY();
         cameraFollow();
     }
-    public void mouseOrbit()
+    public void MouseOrbit()
     {
         x += Input.GetAxis("Mouse X") * xSpeed;
         y -= Input.GetAxis("Mouse Y") * ySpeed;
@@ -46,7 +46,7 @@ public class CameraScript : MonoBehaviour
         Vector3 position = rotation * new Vector3(0.0f, 0.0f, -distance);
         transform.rotation = rotation;
         transform.position = position + Target.position;
-        setCame2Target();
+        SetCame2Target();
     }
 
 
@@ -54,7 +54,7 @@ public class CameraScript : MonoBehaviour
     {
         if (Input.GetMouseButton(0) && !EventSystem.current.currentSelectedGameObject)
         {
-            mouseOrbit();
+            MouseOrbit();
         }
     }
     void cameraFollow()
@@ -69,11 +69,11 @@ public class CameraScript : MonoBehaviour
             angle -= 360;
         return Mathf.Clamp(angle, min, max);
     }
-    public void setTarget(Transform n)
+    public void SetTarget(Transform n)
     {
         Target = n;
         _TargetY = Target.position.y;
-        mouseOrbit();
+        MouseOrbit();
     }
     private void KeepTargetY()
     {
@@ -81,11 +81,11 @@ public class CameraScript : MonoBehaviour
         Target.transform.position = new Vector3(n.x, _TargetY, n.z);
     }
 
-    void setCame2Target()
+    void SetCame2Target()
     {
         cam2Target = transform.position - Target.position;
     }
-    void setAsEditor()
+    void SetAsEditor()
     {
         Vector3 angles = transform.eulerAngles;
         x = angles.y;
@@ -96,7 +96,7 @@ public class CameraScript : MonoBehaviour
     {
         y = n.eulerAngles.x;
         x = n.eulerAngles.y;
-        mouseOrbit();
+        MouseOrbit();
     }
 
     public void StartShake(Collider other)

@@ -18,9 +18,18 @@ public class CameraZLookScript : MonoBehaviour
     // Update is called once per frame
     private void LateUpdate()
     {
-        transform.LookAt(Main.Player.Target.CameraPoint.gameObject.transform);
-        // transform.position = Main.Player.transform.position + cam2Target;
+        LookAtCenter();
     }
+
+    private void LookAtCenter()
+    {
+        //fixme：一直查找transform會很耗效能
+        Vector3 playerPos = Main.Player.CameraPoint.gameObject.transform.position;
+        Vector3 playerTargetPos = Main.Player.Target.CameraPoint.gameObject.transform.position;
+        Vector3 center = (playerTargetPos - playerPos) * 0.5f + playerPos;
+        transform.LookAt(center);
+    }
+
     // void cameraFollow()
     // {
     //     transform.position = followTarget.transform.position + cam2Target;
@@ -30,7 +39,7 @@ public class CameraZLookScript : MonoBehaviour
     //     cam2Target = transform.position - followTarget.transform.position;
     // }
 
-    internal void set2FollwTargetBack()
+    internal void Set2FollwTargetBack()
     {
 
         Vector3 back = Main.Player.Target.transform.position - Main.Player.transform.position;
@@ -40,6 +49,18 @@ public class CameraZLookScript : MonoBehaviour
         transform.position = Main.Player.transform.position + back + Vector3.up * 1.25f;
         transform.LookAt(Main.Player.Target.transform.Find("N1").position);
         Main.Player.transform.LookAt(Main.Player.Target.transform.position);
+
+        //fixme：不要包在這裡
+        SetCameraSidePos();
+    }
+
+    internal void SetCameraSidePos()
+    {
+        //fixme：一直查找transform會很耗效能
+        Vector3 playerPos = Main.Player.CameraPoint.gameObject.transform.position;
+        Vector3 playerTargetPos = Main.Player.Target.CameraPoint.gameObject.transform.position;
+        transform.position += Main.Player.transform.right * 2;
+
     }
 
 
