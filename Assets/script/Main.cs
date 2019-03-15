@@ -123,8 +123,6 @@ public class Main : MonoBehaviour
 		// Player.transform.LookAt(Player.Target.transform.position);
 		ZlookUIAnimator.SetBool("IsZLook", true);
 		//fixme:GetComponent很耗效能
-		Cam.gameObject.GetComponent<Camera>().enabled = false;
-		CamZook.gameObject.GetComponent<Camera>().enabled = true;
 		CamZook.gameObject.GetComponent<CameraZLookScript>().enabled = true;
 		Player.SetIsZookTrue();
 	}
@@ -134,8 +132,6 @@ public class Main : MonoBehaviour
 		ZlookUIAnimator.SetBool("IsZLook", false);
 		// Cam.setPos(CamZook.transform);
 		//fixme:GetComponent很耗效能
-		Cam.gameObject.GetComponent<Camera>().enabled = true;
-		CamZook.gameObject.GetComponent<Camera>().enabled = false;
 		CamZook.gameObject.GetComponent<CameraZLookScript>().enabled = false;
 		Player.SetIsZookFalse();
 
@@ -149,7 +145,9 @@ public class Main : MonoBehaviour
 		if (IsZlook == false)
 		{
 			forward = Cam.transform.forward;
+			forward = new Vector3(forward.x, 0, forward.z);
 			right = Cam.transform.right;
+			right = new Vector3(right.x, 0, right.z);
 		}
 
 		// Fixme:
