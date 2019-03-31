@@ -39,12 +39,20 @@ public class VisualJoyStick : MonoBehaviour, IPointerDownHandler
     // Update is called once per frame
     void Update()
     {
-        UpdateJoyStickVec();
+        // UpdateJoyStickVec();
+        UpdateRealJoyStick();
 
+    }
+
+    private void UpdateRealJoyStick()
+    {
+        joyStickVec.x = Input.GetAxis("Horizontal");
+        joyStickVec.y = Input.GetAxis("Vertical");
     }
 
     private void UpdateJoyStickVec()
     {
+
         //如果滑鼠為點擊或點擊到的介面不是此搖桿則跳出程式
         if (Input.GetMouseButton(0) == false)
         {
@@ -70,6 +78,7 @@ public class VisualJoyStick : MonoBehaviour, IPointerDownHandler
             GetJoyStickVec();
             return;
         }
+
 
     }
 

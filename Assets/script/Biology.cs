@@ -105,6 +105,7 @@ public class Biology : MonoBehaviour
         if (Animator.GetBool("IsMoveable") == false) { SetMoveSpeed(0); return; }
         IsMove = true;
         GoalPos = transform.position + direct.normalized;
+        Debug.Log(direct);
         SetSpeedPercent(direct.magnitude);
         float finalSpeed = Speed * (direct.magnitude);
         SetMoveSpeed(finalSpeed);
